@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
 import 'package:pytch/screens/home/breathe.dart';
-import 'package:pytch/screens/home/newfeed.dart';
+import 'package:pytch/screens/home/broadcast.dart';
 import 'package:pytch/screens/home/social.dart';
 import 'package:pytch/screens/home/rewards.dart';
 import 'package:pytch/screens/home/website.dart';
@@ -38,7 +38,7 @@ class Homebody extends StatelessWidget {
     print('The value of the index is: $index');
     if (index == 0)
       { 
-        Navigator.push(context, MaterialPageRoute(builder: (context) => Newsfeed()));
+        Navigator.push(context, MaterialPageRoute(builder: (context) => Broadcast()));
     } else if (index == 1)
     {
        Navigator.push(context, MaterialPageRoute(builder: (context) => UserList() ));

@@ -16,7 +16,7 @@ class _UserListState extends State<UserList> {
           value: DatabaseService().vapes,
           child:Scaffold(
       appBar: AppBar(
-        title: const Text('Vepos Users'),
+        title: const Text('Broadcasters'),
         backgroundColor: Colors.blue[400],
         elevation: 0.0,
         actions: <Widget>[
@@ -29,7 +29,7 @@ class _UserListState extends State<UserList> {
       body: Container(
            decoration: BoxDecoration(
             image: DecorationImage(
-              image: AssetImage('assets/pytchbg.png'),
+              image: AssetImage('assets/pytch_1125-1240.png'),
               fit: BoxFit.cover,
             ),
           ),

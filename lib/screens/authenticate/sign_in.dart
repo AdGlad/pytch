@@ -40,7 +40,7 @@ class _SignInState extends State<SignIn> {
       body: Container(
         decoration: BoxDecoration(
             image: DecorationImage(
-              image: AssetImage('assets/signin.png'),
+              image: AssetImage('assets/pytch_1125-1240.png'),
               fit: BoxFit.cover,
             ),
           ),

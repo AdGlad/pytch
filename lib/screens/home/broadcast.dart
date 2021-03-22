@@ -2,19 +2,19 @@
 import 'package:flutter/material.dart';
 import 'NewsListView.dart';
 
-class Newsfeed extends StatelessWidget {
+class Broadcast extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Great Vape Debate'),
+        title: Text('Broadcast'),
         //backgroundColor: Colors.redAccent,
       ),
         body: 
         Container( 
             decoration: BoxDecoration(
             image: DecorationImage(
-              image: AssetImage('assets/pytchbg.png'),
+              image: AssetImage('assets/pytch_1125-1240.png'),
               fit: BoxFit.cover,
             ),
           ),
