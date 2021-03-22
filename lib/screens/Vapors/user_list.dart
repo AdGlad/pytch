@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:pytch/models/vape.dart';
-import 'package:pytch/screens/home/vape_list.dart';
+import 'package:pytch/models/user.dart';
+import 'package:pytch/screens/home/user_list.dart';
 import 'package:pytch/services/database.dart';
 
 class UserList extends StatefulWidget {
@@ -12,7 +12,7 @@ class UserList extends StatefulWidget {
 class _UserListState extends State<UserList> {
   @override
   Widget build(BuildContext context) {
-    return StreamProvider<List<Vape>>.value(
+    return StreamProvider<List<UserData>>.value(
           value: DatabaseService().vapes,
           child:Scaffold(
       appBar: AppBar(

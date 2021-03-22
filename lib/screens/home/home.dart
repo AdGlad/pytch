@@ -1,8 +1,7 @@
 
-import 'package:pytch/models/vape.dart';
 import 'package:pytch/screens/Vapors/user_list.dart';
 import 'package:pytch/screens/home/settings_form.dart';
-import 'package:pytch/screens/home/vape_list.dart';
+import 'package:pytch/screens/home/user_list.dart';
 import 'package:pytch/services/auth.dart';
 import 'package:pytch/services/database.dart';
 import 'package:flutter/material.dart';
@@ -35,16 +34,6 @@ Widget build(BuildContext context) {
         backgroundColor: Colors.blue[400],
         elevation: 0.0,
         actions: <Widget>[
-          //FlatButton.icon(
-          //  icon: Icon(Icons.contacts), 
-          //  label: Text('Users'),
-          //  onPressed: () {
-          //      Navigator.push(
-          //        context,
-          //        MaterialPageRoute(builder: (context) => UserList()),
-          //      );
-          //  },
-          //  ),
           TextButton.icon(
             style: TextButton.styleFrom(
                   primary: Colors.white,),

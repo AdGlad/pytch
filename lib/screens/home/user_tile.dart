@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:pytch/models/vape.dart';
-
-class VapeTile extends StatelessWidget {
-  final Vape vape;
-  VapeTile({this.vape});
+import 'package:pytch/models/user.dart';
+class UserDataTile extends StatelessWidget {
+  final UserData user;
+  UserDataTile({this.user});
 
   
   @override
@@ -15,17 +14,16 @@ class VapeTile extends StatelessWidget {
         child: ListTile(
           leading: CircleAvatar(
             radius: 25.0,
-            backgroundColor: Colors.blue[vape.strength],
             backgroundImage: AssetImage('assets/atomizer.png'),
             ),
-            title: Text(vape.name ,
+            title: Text(user.firstname ,
                  style: TextStyle(
                  fontSize: 15,
                  fontWeight: FontWeight.bold,
               color: Colors.blueGrey,
             ),
             ), 
-            subtitle: Text('Started vaping on ${vape.startdate}. Spends \$${vape.dailyspend} a day and vapes about ${vape.frequency} times daily. ${vape.whyquit} is my motivation to quit'),
+            subtitle: Text('Nickname ${user.nickname}.'),
             ),
             )
       );

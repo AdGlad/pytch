@@ -1,40 +1,21 @@
+
 import 'dart:convert';
 
+
 import 'package:flutter/material.dart';
-//import 'package:flutter_webrtc/web/rtc_session_description.dart';
-//import 'package:flutter_webrtc/webrtc.dart';
-import 'package:flutter_webrtc/flutter_webrtc.dart';
+//import 'package:flutter_webrtc/flutter_webrtc.dart';
+//import 'package:sdp_transform/sdp_transform.dart';
+import 'package:flutter_webrtc/webrtc.dart';
 import 'package:sdp_transform/sdp_transform.dart';
 
-void main() {
-  runApp(MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
-      home: MyHomePage(title: 'WebRTC lets learn together'),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
-
+class Broadcast extends StatefulWidget {
+  Broadcast({Key key, this.title}) : super(key: key);
   final String title;
-
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  _BroadcastState createState() => _BroadcastState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _BroadcastState extends State<Broadcast> {
 
   bool _offer = false;
   RTCPeerConnection _peerConnection;
@@ -57,7 +38,8 @@ class _MyHomePageState extends State<MyHomePage> {
     initRenderers();
     _createPeerConnection().then((pc) {
       _peerConnection = pc;
-    });
+    }
+    );
     super.initState();
   }
 
@@ -81,7 +63,7 @@ class _MyHomePageState extends State<MyHomePage> {
     _peerConnection.setLocalDescription(description);
   }
 
-  void _createAnswer() async {
+   void _createAnswer() async {
     RTCSessionDescription description =
         await _peerConnection.createAnswer({'offerToReceiveVideo': 1});
 
@@ -91,8 +73,7 @@ class _MyHomePageState extends State<MyHomePage> {
     //       'sdp': description.sdp.toString(),
     //       'type': description.type.toString(),
     //     }));
-
-    _peerConnection.setLocalDescription(description);
+   _peerConnection.setLocalDescription(description);
   }
 
   void _setRemoteDescription() async {
@@ -162,7 +143,8 @@ class _MyHomePageState extends State<MyHomePage> {
     return pc;
   }
 
-  _getUserMedia() async {
+
+ _getUserMedia() async {
     final Map<String, dynamic> mediaConstraints = {
       'audio': false,
       'video': {
@@ -170,18 +152,19 @@ class _MyHomePageState extends State<MyHomePage> {
       },
     };
 
-    MediaStream stream = await navigator.getUserMedia(mediaConstraints);
+   MediaStream stream = await navigator.getUserMedia(mediaConstraints);
 
     // _localStream = stream;
     _localRenderer.srcObject = stream;
-    //_localRenderer.mirror = true;
+    _localRenderer.mirror = true;
+
 
     // _peerConnection.addStream(stream);
 
     return stream;
-  }
+ }
 
-  SizedBox videoRenderers() => SizedBox(
+    SizedBox videoRenderers() => SizedBox(
       height: 210,
       child: Row(children: [
         Flexible(
@@ -192,14 +175,15 @@ class _MyHomePageState extends State<MyHomePage> {
             child: new RTCVideoView(_localRenderer)
           ),
         ),
-        Flexible(
-          child: new Container(
-              key: new Key("remote"),
-              margin: new EdgeInsets.fromLTRB(5.0, 5.0, 5.0, 5.0),
-              decoration: new BoxDecoration(color: Colors.black),
-              child: new RTCVideoView(_remoteRenderer)),
-        )
+        // Flexible(
+        //   child: new Container(
+        //       key: new Key("remote"),
+        //       margin: new EdgeInsets.fromLTRB(5.0, 5.0, 5.0, 5.0),
+        //       decoration: new BoxDecoration(color: Colors.black),
+        //       child: new RTCVideoView(_remoteRenderer)),
+        // )
       ]));
+
 
   Row offerAndAnswerButtons() =>
       Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: <Widget>[
@@ -224,7 +208,7 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ]);
 
-  Row sdpCandidateButtons() =>
+        Row sdpCandidateButtons() =>
       Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: <Widget>[
         RaisedButton(
           onPressed: _setRemoteDescription,
@@ -251,16 +235,26 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text(widget.title),
-        ),
-        body: Container(
-            child: Column(children: [
+      appBar: AppBar(
+        title: Text('Broadcast'),
+        //title: Text(widget.title),
+      ),
+      body: Container(
+                child: Column(
+                  children: <Widget>[
+                    Expanded(
+                      child: Container(
+                        child:  Column(children: [
           videoRenderers(),
-          offerAndAnswerButtons(),
-          sdpCandidatesTF(),
-          sdpCandidateButtons(),
-        ])));
+          //offerAndAnswerButtons(),
+          //sdpCandidatesTF(),
+          //sdpCandidateButtons(),
+        ])
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+      );
   }
 }
-
