@@ -1,12 +1,8 @@
 import 'package:provider/provider.dart';
 import 'package:pytch/models/user.dart';
 import 'package:pytch/services/database.dart';
-import 'package:pytch/shared/constants.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:pytch/shared/loading.dart';
-import 'package:intl/intl.dart';
-import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
+import 'package:pytch/shared/loading_orig.dart';
 
 
 class SettingsForm extends StatefulWidget {

@@ -1,28 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
 import 'package:pytch/screens/Vapors/user_list.dart';
-import 'package:pytch/screens/home/settings_form.dart';
+//import 'package:pytch/screens/home/settings_form.dart';
 import 'broadcast.dart';
 
-
-
 class Homebody extends StatelessWidget {
-  @override
   List<String> pagenames = ['Broadcast','Listen'];
   List<IconData> pageicons = [Icons.record_voice_over,Icons.hearing];
 
 
-  
+  @override
   Widget build(BuildContext context) {
 
-  void _showSettingsPanel() {
-    showModalBottomSheet(context: context, builder: (context) {
-      return Container(
-          padding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 60.0),
-          child: SettingsForm(),
-      );
-    });
-  }
+  // void _showSettingsPanel() {
+  //   showModalBottomSheet(context: context, builder: (context) {
+  //     return Container(
+  //         padding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 60.0),
+  //         child: SettingsForm(),
+  //     );
+  //   });
+  // }
 
   Future navigateToSubPage(context, index) async {
     print('The value of the index is: $index');

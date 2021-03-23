@@ -1,11 +1,12 @@
 
 import 'dart:convert';
 
-
 import 'package:flutter/material.dart';
 //import 'package:flutter_webrtc/flutter_webrtc.dart';
 //import 'package:sdp_transform/sdp_transform.dart';
 import 'package:flutter_webrtc/webrtc.dart';
+//import 'package:flutter_webrtc/flutter_webrtc.dart';
+
 import 'package:sdp_transform/sdp_transform.dart';
 
 class Broadcast extends StatefulWidget {
@@ -151,12 +152,13 @@ class _BroadcastState extends State<Broadcast> {
         'facingMode': 'user',
       },
     };
-
-   MediaStream stream = await navigator.getUserMedia(mediaConstraints);
+  
+   //MediaStream stream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
+    MediaStream stream = await navigator.getUserMedia(mediaConstraints);
 
     // _localStream = stream;
     _localRenderer.srcObject = stream;
-    _localRenderer.mirror = true;
+    //_localRenderer.mirror = true;
 
 
     // _peerConnection.addStream(stream);

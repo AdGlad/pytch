@@ -1,22 +1,42 @@
 import 'dart:convert';
+
 import 'package:flutter/material.dart';
-//import 'package:flutter_webrtc/flutter_webrtc.dart';
-//import 'package:sdp_transform/sdp_transform.dart';
-//import 'package:flutter_webrtc/flutter_webrtc.dart';
+//import 'package:flutter_webrtc/web/rtc_session_description.dart';
 import 'package:flutter_webrtc/webrtc.dart';
 //import 'package:flutter_webrtc/flutter_webrtc.dart';
-
 import 'package:sdp_transform/sdp_transform.dart';
 
-class Broadcast extends StatefulWidget {
-  Broadcast({Key key, this.title}) : super(key: key);
-  final String title;
-  @override
-  _BroadcastState createState() => _BroadcastState();
+void main() {
+  runApp(MyApp());
 }
 
-class _BroadcastState extends State<Broadcast> {
-bool _offer = false;
+class MyApp extends StatelessWidget {
+  // This widget is the root of your application.
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Flutter Demo',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+      ),
+      home: MyHomePage(title: 'WebRTC lets learn together'),
+    );
+  }
+}
+
+class MyHomePage extends StatefulWidget {
+  MyHomePage({Key key, this.title}) : super(key: key);
+
+  final String title;
+
+  @override
+  _MyHomePageState createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+
+  bool _offer = false;
   RTCPeerConnection _peerConnection;
   MediaStream _localStream;
   RTCVideoRenderer _localRenderer = new RTCVideoRenderer();
@@ -150,8 +170,7 @@ bool _offer = false;
       },
     };
 
-   // MediaStream stream = await navigator.getUserMedia(mediaConstraints);
-   // MediaStream stream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
+    //MediaStream stream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
     MediaStream stream = await navigator.getUserMedia(mediaConstraints);
 
     // _localStream = stream;
@@ -230,30 +249,19 @@ bool _offer = false;
         ),
       );
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Broadcast'),
-        //title: Text(widget.title),
-      ),
-      body: Container(
-                child: Column(
-                  children: <Widget>[
-                    Expanded(
-                      child: Container(
-                        child:  Column(children: [
+        appBar: AppBar(
+          title: Text(widget.title),
+        ),
+        body: Container(
+            child: Column(children: [
           videoRenderers(),
           offerAndAnswerButtons(),
           sdpCandidatesTF(),
           sdpCandidateButtons(),
-        ])
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-      );
+        ])));
   }
 }
+

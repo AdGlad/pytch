@@ -1,9 +1,8 @@
 
-import 'package:pytch/screens/Vapors/user_list.dart';
 import 'package:pytch/screens/home/settings_form.dart';
-import 'package:pytch/screens/home/user_list.dart';
+//import 'package:pytch/screens/home/user_list.dart';
 import 'package:pytch/services/auth.dart';
-import 'package:pytch/services/database.dart';
+//import 'package:pytch/services/database.dart';
 import 'package:flutter/material.dart';
 
 import 'homebody.dart';
@@ -14,8 +13,9 @@ class Home extends  StatelessWidget{
     
 @override
 Widget build(BuildContext context) {
-
-  Widget _showSettingsPanel() {
+  Widget 
+  
+  _showSettingsPanel() {
     showModalBottomSheet(
        // isScrollControlled: true,
         context: context, builder: (context) {
@@ -24,9 +24,9 @@ Widget build(BuildContext context) {
           child: SettingsForm(),
       );
     });
-  }
-
-    return  Scaffold(
+  }    
+  
+  return  Scaffold(
        //resizeToAvoidBottomPadding: false,
         backgroundColor: Colors.blue[50],
       appBar: AppBar(

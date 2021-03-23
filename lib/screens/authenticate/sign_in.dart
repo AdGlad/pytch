@@ -1,8 +1,8 @@
-import 'package:firebase_auth/firebase_auth.dart';
+//import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:pytch/services/auth.dart';
 import 'package:pytch/shared/constants.dart';
-import 'package:pytch/shared/loading.dart';
+import 'package:pytch/shared/loading_orig.dart';
 
 
 class SignIn extends StatefulWidget {
