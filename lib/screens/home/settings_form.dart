@@ -2,7 +2,7 @@ import 'package:provider/provider.dart';
 import 'package:pytch/models/user.dart';
 import 'package:pytch/services/database.dart';
 import 'package:flutter/material.dart';
-import 'package:pytch/shared/loading_orig.dart';
+import 'package:pytch/shared/loading.dart';
 
 
 class SettingsForm extends StatefulWidget {
@@ -21,10 +21,7 @@ class _SettingsFormState extends State<SettingsForm> {
 
   @override
   Widget build(BuildContext context) {
-
     User user = Provider.of<User>(context);
-
-
     return StreamBuilder<UserData>(
       stream: DatabaseService(uid: user.uid).userData,
       builder: (context, snapshot) {

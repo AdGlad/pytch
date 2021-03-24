@@ -13,18 +13,18 @@ class Home extends  StatelessWidget{
     
 @override
 Widget build(BuildContext context) {
-  Widget 
+  // Widget 
   
-  _showSettingsPanel() {
-    showModalBottomSheet(
-       // isScrollControlled: true,
-        context: context, builder: (context) {
-      return Container( 
-          padding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 60.0),
-          child: SettingsForm(),
-      );
-    });
-  }    
+  // _showSettingsPanel() {
+  //   showModalBottomSheet(
+  //      // isScrollControlled: true,
+  //       context: context, builder: (context) {
+  //     return Container( 
+  //         padding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 60.0),
+  //         child: SettingsForm(),
+  //     );
+  //   });
+  // }    
   
   return  Scaffold(
        //resizeToAvoidBottomPadding: false,
@@ -48,7 +48,16 @@ Widget build(BuildContext context) {
             primary: Colors.white,),
             icon: Icon(Icons.settings),
             label: Text('Settings'),
-            onPressed: () => _showSettingsPanel(),
+            onPressed: () => {
+                 showModalBottomSheet(
+                        // isScrollControlled: true,
+                      context: context, builder: (context) {
+                      return Container( 
+                          padding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 60.0),
+                          child: SettingsForm(),
+                              );
+                      })
+            }
             )
         ],
       ),

@@ -113,13 +113,19 @@ bool _offer = false;
       },
       "optional": [],
     };
+    print('000000000');
 
     _localStream = await _getUserMedia();
+    print('111111111111');
+    print(_localStream);
 
     RTCPeerConnection pc = await createPeerConnection(configuration, offerSdpConstraints);
+    print(pc);
+    print('22222222');
+
     // if (pc != null) print(pc);
     pc.addStream(_localStream);
-
+    print('333333333');
     pc.onIceCandidate = (e) {
       if (e.candidate != null) {
         print(json.encode({
@@ -129,20 +135,25 @@ bool _offer = false;
         }));
       }
     };
+    print('444444');
 
     pc.onIceConnectionState = (e) {
       print(e);
     };
+    print('55555555');
 
     pc.onAddStream = (stream) {
       print('addStream: ' + stream.id);
       _remoteRenderer.srcObject = stream;
     };
+    print('666666');
 
     return pc;
   }
 
   _getUserMedia() async {
+    print('XXXXX');
+
     final Map<String, dynamic> mediaConstraints = {
       'audio': false,
       'video': {
@@ -150,15 +161,30 @@ bool _offer = false;
       },
     };
 
+    //     final Map<String, dynamic> mediaConstraints = {
+    //   'audio': true,
+    //   'video': false
+    // };
+
+    //var mediaConstraints = { 'audio': true, 'video': { 'width': 1280, 'height': 720 } };
+
+    print('YYYYY');
+
    // MediaStream stream = await navigator.getUserMedia(mediaConstraints);
    // MediaStream stream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
-    MediaStream stream = await navigator.getUserMedia(mediaConstraints);
+   MediaStream stream = await navigator.getUserMedia(mediaConstraints);
+    //MediaStream stream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
+    print('ZZZZZZ');
 
     // _localStream = stream;
-    _localRenderer.srcObject = stream;
-    //_localRenderer.mirror = true;
+    print(stream);
+    print('AAAAA');
 
-    // _peerConnection.addStream(stream);
+    _localRenderer.srcObject = stream;
+   // _localRenderer.mirror = true;
+    print('BBBBB');
+
+     //_peerConnection.addStream(stream);
 
     return stream;
   }

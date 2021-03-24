@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:pytch/services/auth.dart';
 import 'package:pytch/shared/constants.dart';
-import 'package:pytch/shared/loading_orig.dart';
+import 'package:pytch/shared/loading.dart';
 
 
 class SignIn extends StatefulWidget {

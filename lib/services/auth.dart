@@ -1,11 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
-//import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pytch/models/user.dart';
 import 'package:pytch/services/database.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   // Create user object based on FirebaseUser
+
   User _userFromFirebaseUser(FirebaseUser user){
     return user !=null ? User(uid: user.uid) : null;
   }
