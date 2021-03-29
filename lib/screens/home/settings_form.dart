@@ -1,6 +1,6 @@
 import 'package:provider/provider.dart';
 import 'package:pytch/models/user.dart';
-import 'package:pytch/services/database.dart';
+import 'package:pytch/services/db_user.dart';
 import 'package:flutter/material.dart';
 import 'package:pytch/shared/loading.dart';
 
@@ -23,7 +23,7 @@ class _SettingsFormState extends State<SettingsForm> {
   Widget build(BuildContext context) {
     User user = Provider.of<User>(context);
     return StreamBuilder<UserData>(
-      stream: DatabaseService(uid: user.uid).userData,
+      stream: DbUserService(uid: user.uid).userData,
       builder: (context, snapshot) {
         if(snapshot.hasData) {
           UserData userData = snapshot.data;
@@ -83,7 +83,7 @@ class _SettingsFormState extends State<SettingsForm> {
                           ),
                           onPressed: () async {
                             if(_formKey.currentState.validate()){
-                              await DatabaseService(uid: user.uid).updateUserData(
+                              await DbUserService(uid: user.uid).updateUserData(
                                 _currentfirstname ?? snapshot.data.firstname, 
                                 _currentlastname ?? snapshot.data.lastname, 
                                 _currentnickname ?? snapshot.data.nickname, 

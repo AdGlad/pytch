@@ -2,13 +2,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 //import 'package:flutter/material.dart';
 import 'package:pytch/models/user.dart';
 
-class DatabaseService {
+class DbUserService {
 
 final String uid;
-DatabaseService({this.uid});
+DbUserService({this.uid});
 
    final CollectionReference userCollection = Firestore.instance.collection('users');
-
       Future<void> updateUserData(String firstname, 
                                String lastname,
                                String nickname,

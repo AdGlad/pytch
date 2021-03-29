@@ -5,8 +5,13 @@ import 'package:flutter/material.dart';
 //import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:flutter_webrtc/webrtc.dart';
 //import 'package:flutter_webrtc/flutter_webrtc.dart';
-
 import 'package:sdp_transform/sdp_transform.dart';
+// Import the firebase_core and cloud_firestore plugin
+import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:pytch/services/db_event.dart';
+import 'package:uuid/uuid.dart';
+
 
 class Broadcast extends StatefulWidget {
   Broadcast({Key key, this.title}) : super(key: key);
@@ -46,7 +51,11 @@ bool _offer = false;
     await _remoteRenderer.initialize();
   }
 
-  void _createOffer() async {
+  void _createEvent() async {
+    var uuid = Uuid();
+    var eventid = uuid.v4();
+    //CollectionReference events = Firestore.instance.collection('event')    ;
+
     RTCSessionDescription description =
         await _peerConnection.createOffer({'offerToReceiveVideo': 1});
     var session = parse(description.sdp);
@@ -58,7 +67,35 @@ bool _offer = false;
     //       'type': description.type.toString(),
     //     }));
 
+    // _offer String = 
+    //       'offer': {
+    //         'type': description.type,
+    //         'sdp':  description.sdp
+    //         }
+    //     })
+
     _peerConnection.setLocalDescription(description);
+    //DbEventService(uid: eventid).createEventData('Manly round 3', 'offer', 'answer');
+    DbEventService(uid: eventid).createEventData('Manly round 3', '1234');
+    DbEventService(uid: eventid).updateEventoffer(description.type, json.encode(session));
+    print('******************************');
+    print(eventid);
+    print('******************************');
+    //DbEventService(uid: null).updateEventofferData('Manly round 3', _offer, 'answer');
+    // events.add({
+    //   'event': 'Manly round 2',
+    //   'offer': {
+    //         'type': description.type,
+    //         'sdp':  description.sdp
+    //         }
+    //     })
+    //     .then((value) => print("Event Added")).
+    //     catchError((error) => print("Failed to add event: $error"));
+
+//const _eventId = events.id;
+//print(events[1].event);
+//#document.querySelector('#currentRoom').innerText = `Current room is ${roomId} - You are the caller!`
+
   }
 
   void _createAnswer() async {
@@ -221,8 +258,8 @@ bool _offer = false;
           //         );
           //       });
           // },
-          onPressed: _createOffer,
-          child: Text('Offer'),
+          onPressed: _createEvent,
+          child: Text('Create Event'),
           color: Colors.amber,
         ),
         RaisedButton(
@@ -265,6 +302,12 @@ bool _offer = false;
         //title: Text(widget.title),
       ),
       body: Container(
+                 decoration: BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage('assets/pytch_1125-1240.png'),
+              fit: BoxFit.cover,
+            ),
+          ),
                 child: Column(
                   children: <Widget>[
                     Expanded(

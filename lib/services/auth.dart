@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pytch/models/user.dart';
-import 'package:pytch/services/database.dart';
+import 'package:pytch/services/db_user.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -22,7 +22,7 @@ Future registerWithEmailAndPassword(String email, String password) async
   try {
     AuthResult result = await _auth.createUserWithEmailAndPassword(email: email, password: password);
     FirebaseUser user = result.user;
-    await DatabaseService(uid: user.uid).updateUserData('firstname', 'lastname', 'nickname', 'M' );
+    await DbUserService(uid: user.uid).updateUserData('firstname', 'lastname', 'nickname', 'M' );
     return _userFromFirebaseUser(user);
   }
   catch(e) {

@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
 import 'package:pytch/screens/Vapors/user_list.dart';
+import 'package:pytch/screens/Events/event_list.dart';
 //import 'package:pytch/screens/home/settings_form.dart';
 import 'broadcast.dart';
 
 class Homebody extends StatelessWidget {
-  List<String> pagenames = ['Broadcast','Listen'];
-  List<IconData> pageicons = [Icons.record_voice_over,Icons.hearing];
+  List<String> pagenames = ['Broadcast','Listen','Event'];
+  List<IconData> pageicons = [Icons.record_voice_over,Icons.hearing,Icons.access_alarm];
 
 
   @override
@@ -29,6 +30,9 @@ class Homebody extends StatelessWidget {
     } else if (index == 1)
     {
        Navigator.push(context, MaterialPageRoute(builder: (context) => UserList() ));
+    } else if (index == 2)
+    {
+       Navigator.push(context, MaterialPageRoute(builder: (context) => EventList() ));
     } 
 
 }
@@ -50,7 +54,7 @@ class Homebody extends StatelessWidget {
                 //crossAxisSpacing: 00,
                 //childAspectRatio: 8.0 / 9.0,
                 // Generate 6 widgets that display their index in the List.
-                children: List.generate(2, (index) {
+                children: List.generate(3, (index) {
                   return Container( 
                     margin: EdgeInsets.all(20),
                     //width: 20,

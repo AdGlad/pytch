@@ -1,22 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:pytch/models/user.dart';
-import 'package:pytch/screens/home/user_list.dart';
-import 'package:pytch/services/db_user.dart';
+import 'package:pytch/models/event.dart';
+import 'package:pytch/screens/home/event_list.dart';
+import 'package:pytch/services/db_event.dart';
 
-class UserList extends StatefulWidget {
+class EventList extends StatefulWidget {
   @override
-  _UserListState createState() => _UserListState();
+  _EventListState createState() => _EventListState();
 }
 
-class _UserListState extends State<UserList> {
+class _EventListState extends State<EventList> {
   @override
   Widget build(BuildContext context) {
-    return StreamProvider<List<UserData>>.value(
-          value: DbUserService().vapes,
+    return StreamProvider<List<EventData>>.value(
+          value: DbEventService().events,
           child:Scaffold(
       appBar: AppBar(
-        title: const Text('Broadcasters'),
+        title: const Text('Events'),
         backgroundColor: Colors.blue[400],
         elevation: 0.0,
         actions: <Widget>[
@@ -33,7 +33,7 @@ class _UserListState extends State<UserList> {
               fit: BoxFit.cover,
             ),
           ),
-          child: VapeList()
+          child: EventsList()
         ),
         )
     );
