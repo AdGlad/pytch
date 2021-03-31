@@ -39,10 +39,10 @@ bool _offer = false;
 
   @override
   void initState() {
-    initRenderers();
-    _createPeerConnection().then((pc) {
-      _peerConnection = pc;
-    });
+    // initRenderers();
+    // _createPeerConnection().then((pc) {
+    //   _peerConnection = pc;
+    // });
     super.initState();
   }
 
@@ -52,27 +52,23 @@ bool _offer = false;
   }
 
   void _createEvent() async {
+    try {
     var uuid = Uuid();
     var eventid = uuid.v4();
-    //CollectionReference events = Firestore.instance.collection('event')    ;
-
+    initRenderers();
+    _createPeerConnection().then((pc) {
+      _peerConnection = pc;
+      });
     RTCSessionDescription description =
         await _peerConnection.createOffer({'offerToReceiveVideo': 1});
     var session = parse(description.sdp);
+    print('HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH');
+    print(description.sdp);
+    print('SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS');
     print(json.encode(session));
+    print('SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS');
+
     _offer = true;
-
-    // print(json.encode({
-    //       'sdp': description.sdp.toString(),
-    //       'type': description.type.toString(),
-    //     }));
-
-    // _offer String = 
-    //       'offer': {
-    //         'type': description.type,
-    //         'sdp':  description.sdp
-    //         }
-    //     })
 
     _peerConnection.setLocalDescription(description);
     //DbEventService(uid: eventid).createEventData('Manly round 3', 'offer', 'answer');
@@ -81,21 +77,10 @@ bool _offer = false;
     print('******************************');
     print(eventid);
     print('******************************');
-    //DbEventService(uid: null).updateEventofferData('Manly round 3', _offer, 'answer');
-    // events.add({
-    //   'event': 'Manly round 2',
-    //   'offer': {
-    //         'type': description.type,
-    //         'sdp':  description.sdp
-    //         }
-    //     })
-    //     .then((value) => print("Event Added")).
-    //     catchError((error) => print("Failed to add event: $error"));
-
-//const _eventId = events.id;
-//print(events[1].event);
 //#document.querySelector('#currentRoom').innerText = `Current room is ${roomId} - You are the caller!`
-
+    } catch (e) {
+      print(e.toString());
+    }
   }
 
   void _createAnswer() async {
@@ -137,9 +122,10 @@ bool _offer = false;
   }
 
   _createPeerConnection() async {
+    print('_createPeerConnection');
     Map<String, dynamic> configuration = {
       "iceServers": [
-        {"url": "stun:stun.l.google.com:19302"},
+        {"urls": "stun:stun.l.google.com:19302"},
       ]
     };
 
@@ -163,6 +149,7 @@ bool _offer = false;
     // if (pc != null) print(pc);
     pc.addStream(_localStream);
     print('333333333');
+    // This appears to be where the candidate is generated. loops for each candidate
     pc.onIceCandidate = (e) {
       if (e.candidate != null) {
         print(json.encode({
@@ -237,13 +224,13 @@ bool _offer = false;
             child: new RTCVideoView(_localRenderer)
           ),
         ),
-        Flexible(
-          child: new Container(
-              key: new Key("remote"),
-              margin: new EdgeInsets.fromLTRB(5.0, 5.0, 5.0, 5.0),
-              decoration: new BoxDecoration(color: Colors.black),
-              child: new RTCVideoView(_remoteRenderer)),
-        )
+        // Flexible(
+        //   child: new Container(
+        //       key: new Key("remote"),
+        //       margin: new EdgeInsets.fromLTRB(5.0, 5.0, 5.0, 5.0),
+        //       decoration: new BoxDecoration(color: Colors.black),
+        //       child: new RTCVideoView(_remoteRenderer)),
+        // )
       ]));
 
   Row offerAndAnswerButtons() =>
@@ -262,11 +249,11 @@ bool _offer = false;
           child: Text('Create Event'),
           color: Colors.amber,
         ),
-        RaisedButton(
-          onPressed: _createAnswer,
-          child: Text('Answer'),
-          color: Colors.amber,
-        ),
+        // RaisedButton(
+        //   onPressed: _createAnswer,
+        //   child: Text('Answer'),
+        //   color: Colors.amber,
+        // ),
       ]);
 
   Row sdpCandidateButtons() =>
@@ -313,9 +300,9 @@ bool _offer = false;
                     Expanded(
                       child: Container(
                         child:  Column(children: [
-          videoRenderers(),
-          offerAndAnswerButtons(),
-          sdpCandidatesTF(),
+         videoRenderers(),
+         offerAndAnswerButtons(),
+         sdpCandidatesTF(),
           sdpCandidateButtons(),
         ])
                       ),

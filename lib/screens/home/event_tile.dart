@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pytch/models/event.dart';
+import 'package:pytch/screens/home/listen.dart';
 class EventDataTile extends StatelessWidget {
   final EventData event;
   EventDataTile({this.event});
@@ -12,6 +13,11 @@ class EventDataTile extends StatelessWidget {
       child: Card(
         margin: EdgeInsets.fromLTRB(20.0, 6.0, 20.0, 0.0),
         child: ListTile(
+          //onTap: () {print('Heeellllllo');},
+          onTap: () {
+            Navigator.push(context,
+            MaterialPageRoute(builder: (context) => Listen(offer: event.offer)));
+          },
           leading: CircleAvatar(
             radius: 25.0,
             backgroundImage: AssetImage('assets/atomizer.png'),
