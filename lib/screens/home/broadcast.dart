@@ -83,34 +83,33 @@ bool _offer = false;
     }
   }
 
-  void _createAnswer() async {
-    RTCSessionDescription description =
-        await _peerConnection.createAnswer({'offerToReceiveVideo': 1});
+  // void _createAnswer() async {
+  //   RTCSessionDescription description =
+  //       await _peerConnection.createAnswer({'offerToReceiveVideo': 1});
 
-    var session = parse(description.sdp);
-    print(json.encode(session));
-    // print(json.encode({
-    //       'sdp': description.sdp.toString(),
-    //       'type': description.type.toString(),
-    //     }));
+  //   var session = parse(description.sdp);
+  //   print(json.encode(session));
+  //   // print(json.encode({
+  //   //       'sdp': description.sdp.toString(),
+  //   //       'type': description.type.toString(),
+  //   //     }));
 
-    _peerConnection.setLocalDescription(description);
-  }
+  //   _peerConnection.setLocalDescription(description);
+  // }
 
-  void _setRemoteDescription() async {
-    String jsonString = sdpController.text;
-    dynamic session = await jsonDecode('$jsonString');
+  // void _setRemoteDescription() async {
+  //   String jsonString = sdpController.text;
+  //   dynamic session = await jsonDecode('$jsonString');
 
-    String sdp = write(session, null);
+  //   String sdp = write(session, null);
 
-    // RTCSessionDescription description =
-    //     new RTCSessionDescription(session['sdp'], session['type']);
-    RTCSessionDescription description =
-        new RTCSessionDescription(sdp, _offer ? 'answer' : 'offer');
-    print(description.toMap());
 
-    await _peerConnection.setRemoteDescription(description);
-  }
+  //   RTCSessionDescription description =
+  //       new RTCSessionDescription(sdp, _offer ? 'answer' : 'offer');
+  //   print(description.toMap());
+
+  //   await _peerConnection.setRemoteDescription(description);
+  // }
 
   void _addCandidate() async {
     String jsonString = sdpController.text;
@@ -196,8 +195,8 @@ bool _offer = false;
 
    // MediaStream stream = await navigator.getUserMedia(mediaConstraints);
    // MediaStream stream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
-   MediaStream stream = await navigator.getUserMedia(mediaConstraints);
-    //MediaStream stream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
+  MediaStream stream = await navigator.getUserMedia(mediaConstraints);
+   // MediaStream stream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
     print('ZZZZZZ');
 
     // _localStream = stream;
@@ -258,11 +257,11 @@ bool _offer = false;
 
   Row sdpCandidateButtons() =>
       Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: <Widget>[
-        RaisedButton(
-          onPressed: _setRemoteDescription,
-          child: Text('Set Remote Desc'),
-          color: Colors.amber,
-        ),
+        // RaisedButton(
+        //   onPressed: _setRemoteDescription,
+        //   child: Text('Set Remote Desc'),
+        //   color: Colors.amber,
+        // ),
         RaisedButton(
           onPressed: _addCandidate,
           child: Text('Add Candidate'),

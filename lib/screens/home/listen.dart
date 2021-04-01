@@ -16,9 +16,9 @@ import 'package:pytch/models/event.dart';
 
 class Listen extends StatefulWidget {
 
-final String offer;
+final EventData event;
 
-  Listen({Key key, this.offer, this.title}) : super(key: key);
+  Listen({Key key, this.event, this.title}) : super(key: key);
   final String title;
   @override
   _ListenState createState() => _ListenState();
@@ -58,7 +58,9 @@ bool _offer = false;
   void _showEvent() async {
    
     print('******************************');
-    print(widget.offer);
+    print(widget.event.eventname);
+    print(widget.event.uid);
+    print(widget.event.offer);
     print('******************************');
 
 
@@ -69,32 +71,49 @@ bool _offer = false;
        initRenderers();
        _createPeerConnection().then((pc){_peerConnection = pc;});
 
-    // RTCSessionDescription description =
-    //     await _peerConnection.createAnswer({'offerToReceiveVideo': 1});
-     DocumentSnapshot jsonString = await Firestore.instance.collection('events').document('0aba43ea-64f4-4e9a-9edc-bf24c4042898').get();
+     RTCSessionDescription description =
+         await _peerConnection.createAnswer({'offerToReceiveVideo': 1});
+     //DocumentSnapshot jsonString = await Firestore.instance.collection('events').document('0aba43ea-64f4-4e9a-9edc-bf24c4042898').get();
+     //DocumentSnapshot jsonString = await Firestore.instance.collection('events').document(widget.event.uid).get();
     
-     print('##########################################');
-     print(jsonString.data['eventname']);
-     print(jsonString.data['offer']['sdp']);
-     print('##########################################');
+    //  print('##########################################');
+    //  print(jsonString.data['eventname']);
+    //  print(jsonString.data['offer']['sdp']);
+    //  print('##########################################');
+    // print('##########################################');
+    //  print(widget.event.eventname);
+    //  print(widget.event.offer);
+    //  print('##########################################');
+    //_showEvent();
+    var session = parse(description.sdp);
+        print(json.encode(session));
+        print(json.encode({
+               'sdp': description.sdp.toString(),
+               'type': description.type.toString(),
+               }));
 
-    // var session = parse(description.sdp);
-    // print(json.encode(session));
-    // // print(json.encode({
-    // //       'sdp': description.sdp.toString(),
-    // //       'type': description.type.toString(),
-    // //     }));
-
-    // _peerConnection.setLocalDescription(description);
+     _peerConnection.setLocalDescription(description);
+     DbEventService(uid: widget.event.uid).updateEventanswer(description.type, json.encode(session));
   }
 
   void _setRemoteDescription() async {
   print('_setRemoteDescription AG');
     // This is where we need to apply SDP from Firebase
     //DocumentSnapshot jsonString = await Firestore.instance.collection('events').document('0aba43ea-64f4-4e9a-9edc-bf24c4042898').get();
+    //DocumentSnapshot jsonString = await Firestore.instance.collection('events').document(widget.event.uid).get();
+    //String jsonString = await Firestore.instance.collection('events').document(widget.event.uid).get();
+     
+     //print(widget.event.eventname);
+    // print(widget.event.offer);
 
+    //dynamic session = await jsonDecode('$jsonString');
+
+    sdpController.text  = widget.event.offer;
+    
     String jsonString = sdpController.text;
     dynamic session = await jsonDecode('$jsonString');
+    //String session =widget.event.offer;
+    //String sdp = session;
 
     String sdp = write(session, null);
 
@@ -105,8 +124,8 @@ bool _offer = false;
 
     //print('##########################################');
 
-    print(description.toMap());
-    //print('##########################################');
+   // print(description.toMap());
+    print('##########################################');
 
     await _peerConnection.setRemoteDescription(description);
   }
@@ -195,16 +214,16 @@ bool _offer = false;
    // MediaStream stream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
    MediaStream stream = await navigator.getUserMedia(mediaConstraints);
     //MediaStream stream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
-    print('ZZZZZZ');
-    print('offer');
+   // print('ZZZZZZ');
+   // print('offer');
 
     // _localStream = stream;
-    print(stream);
-    print('AAAAA');
+   // print(stream);
+   // print('AAAAA');
 
     _localRenderer.srcObject = stream;
    // _localRenderer.mirror = true;
-    print('BBBBB');
+   // print('BBBBB');
 
      //_peerConnection.addStream(stream);
 

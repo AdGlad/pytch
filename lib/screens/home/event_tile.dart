@@ -16,7 +16,7 @@ class EventDataTile extends StatelessWidget {
           //onTap: () {print('Heeellllllo');},
           onTap: () {
             Navigator.push(context,
-            MaterialPageRoute(builder: (context) => Listen(offer: event.offer)));
+            MaterialPageRoute(builder: (context) => Listen(event: event)));
           },
           leading: CircleAvatar(
             radius: 25.0,
