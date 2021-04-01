@@ -108,7 +108,7 @@ bool _offer = false;
 
     //dynamic session = await jsonDecode('$jsonString');
 
-    sdpController.text  = widget.event.offer;
+    // AG   sdpController.text  = widget.event.offer;
     
     String jsonString = sdpController.text;
     dynamic session = await jsonDecode('$jsonString');
@@ -116,18 +116,27 @@ bool _offer = false;
     //String sdp = session;
 
     String sdp = write(session, null);
+    print('PPPPPPPPPPPPPPPPPPPPPPPP');
+    print(sdp);
+    print('PPPPPPPPPPPPPPPPPPPPPPPP');
 
     // RTCSessionDescription description =
     //     new RTCSessionDescription(session['sdp'], session['type']);
-    RTCSessionDescription description =
-        new RTCSessionDescription(sdp, _offer ? 'answer' : 'offer');
+    // RTCSessionDescription description =
+    //     new RTCSessionDescription(sdp, _offer ? 'answer' : 'offer');
 
-    //print('##########################################');
+        RTCSessionDescription description =
+        new RTCSessionDescription(sdp, 'answer' );
 
-   // print(description.toMap());
+    print('##########################################');
+    print(description.toMap());
     print('##########################################');
 
     await _peerConnection.setRemoteDescription(description);
+    print('EEEEEEEEEEEEEEEEEE');
+
+
+
   }
 
   void _addCandidate() async {
