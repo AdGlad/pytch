@@ -1,27 +1,26 @@
 import 'dart:convert';
-import 'package:flutter/material.dart';
-//import 'package:flutter_webrtc/flutter_webrtc.dart';
-//import 'package:sdp_transform/sdp_transform.dart';
-//import 'package:flutter_webrtc/flutter_webrtc.dart';
-import 'package:flutter_webrtc/webrtc.dart';
-//import 'package:flutter_webrtc/flutter_webrtc.dart';
-import 'package:sdp_transform/sdp_transform.dart';
-// Import the firebase_core and cloud_firestore plugin
-import 'package:firebase_core/firebase_core.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:pytch/services/db_event.dart';
-import 'package:uuid/uuid.dart';
 
+import 'package:flutter/material.dart';
+// import 'package:flutter_webrtc/web/rtc_session_description.dart';
+import 'package:flutter_webrtc/webrtc.dart';
+import 'package:sdp_transform/sdp_transform.dart';
+import 'package:pytch/services/db_event.dart';
+// AG
+import 'package:uuid/uuid.dart';
+// AG
 
 class Broadcast extends StatefulWidget {
   Broadcast({Key key, this.title}) : super(key: key);
+
   final String title;
+
   @override
   _BroadcastState createState() => _BroadcastState();
 }
 
 class _BroadcastState extends State<Broadcast> {
-bool _offer = false;
+
+  bool _offer = false;
   RTCPeerConnection _peerConnection;
   MediaStream _localStream;
   RTCVideoRenderer _localRenderer = new RTCVideoRenderer();
@@ -39,10 +38,10 @@ bool _offer = false;
 
   @override
   void initState() {
-    // initRenderers();
-    // _createPeerConnection().then((pc) {
-    //   _peerConnection = pc;
-    // });
+    initRenderers();
+    _createPeerConnection().then((pc) {
+      _peerConnection = pc;
+    });
     super.initState();
   }
 
@@ -51,65 +50,58 @@ bool _offer = false;
     await _remoteRenderer.initialize();
   }
 
-  void _createEvent() async {
-    try {
+  void _createOffer() async {
+    // AG
     var uuid = Uuid();
     var eventid = uuid.v4();
-    initRenderers();
-    _createPeerConnection().then((pc) {
-      _peerConnection = pc;
-      });
+    // AG
     RTCSessionDescription description =
         await _peerConnection.createOffer({'offerToReceiveVideo': 1});
     var session = parse(description.sdp);
-    print('HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH');
-    print(description.sdp);
-    print('SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS');
     print(json.encode(session));
-    print('SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS');
-
     _offer = true;
 
+    // print(json.encode({
+    //       'sdp': description.sdp.toString(),
+    //       'type': description.type.toString(),
+    //     }));
+
     _peerConnection.setLocalDescription(description);
-    //DbEventService(uid: eventid).createEventData('Manly round 3', 'offer', 'answer');
-    DbEventService(uid: eventid).createEventData('Manly round 3', '1234');
-    DbEventService(uid: eventid).updateEventoffer(description.type, json.encode(session));
-    print('******************************');
+    // AG
     print(eventid);
-    print('******************************');
-//#document.querySelector('#currentRoom').innerText = `Current room is ${roomId} - You are the caller!`
-    } catch (e) {
-      print(e.toString());
-    }
+    DbEventService(uid: eventid).createEventData('Manly round 5', '1234');
+    DbEventService(uid: eventid).updateEventoffer(description.type, json.encode(session));
+    // AG
   }
 
-  // void _createAnswer() async {
-  //   RTCSessionDescription description =
-  //       await _peerConnection.createAnswer({'offerToReceiveVideo': 1});
+  void _createAnswer() async {
+    RTCSessionDescription description =
+        await _peerConnection.createAnswer({'offerToReceiveVideo': 1});
 
-  //   var session = parse(description.sdp);
-  //   print(json.encode(session));
-  //   // print(json.encode({
-  //   //       'sdp': description.sdp.toString(),
-  //   //       'type': description.type.toString(),
-  //   //     }));
+    var session = parse(description.sdp);
+    print(json.encode(session));
+    // print(json.encode({
+    //       'sdp': description.sdp.toString(),
+    //       'type': description.type.toString(),
+    //     }));
 
-  //   _peerConnection.setLocalDescription(description);
-  // }
+    _peerConnection.setLocalDescription(description);
+  }
 
-  // void _setRemoteDescription() async {
-  //   String jsonString = sdpController.text;
-  //   dynamic session = await jsonDecode('$jsonString');
+  void _setRemoteDescription() async {
+    String jsonString = sdpController.text;
+    dynamic session = await jsonDecode('$jsonString');
 
-  //   String sdp = write(session, null);
+    String sdp = write(session, null);
 
+    // RTCSessionDescription description =
+    //     new RTCSessionDescription(session['sdp'], session['type']);
+    RTCSessionDescription description =
+        new RTCSessionDescription(sdp, _offer ? 'answer' : 'offer');
+    print(description.toMap());
 
-  //   RTCSessionDescription description =
-  //       new RTCSessionDescription(sdp, _offer ? 'answer' : 'offer');
-  //   print(description.toMap());
-
-  //   await _peerConnection.setRemoteDescription(description);
-  // }
+    await _peerConnection.setRemoteDescription(description);
+  }
 
   void _addCandidate() async {
     String jsonString = sdpController.text;
@@ -121,10 +113,9 @@ bool _offer = false;
   }
 
   _createPeerConnection() async {
-    print('_createPeerConnection');
     Map<String, dynamic> configuration = {
       "iceServers": [
-        {"urls": "stun:stun.l.google.com:19302"},
+        {"url": "stun:stun.l.google.com:19302"},
       ]
     };
 
@@ -135,20 +126,13 @@ bool _offer = false;
       },
       "optional": [],
     };
-    print('000000000');
 
     _localStream = await _getUserMedia();
-    print('111111111111');
-    print(_localStream);
 
     RTCPeerConnection pc = await createPeerConnection(configuration, offerSdpConstraints);
-    print(pc);
-    print('22222222');
-
     // if (pc != null) print(pc);
     pc.addStream(_localStream);
-    print('333333333');
-    // This appears to be where the candidate is generated. loops for each candidate
+
     pc.onIceCandidate = (e) {
       if (e.candidate != null) {
         print(json.encode({
@@ -158,25 +142,20 @@ bool _offer = false;
         }));
       }
     };
-    print('444444');
 
     pc.onIceConnectionState = (e) {
       print(e);
     };
-    print('55555555');
 
     pc.onAddStream = (stream) {
       print('addStream: ' + stream.id);
       _remoteRenderer.srcObject = stream;
     };
-    print('666666');
 
     return pc;
   }
 
   _getUserMedia() async {
-    print('XXXXX');
-
     final Map<String, dynamic> mediaConstraints = {
       'audio': false,
       'video': {
@@ -184,30 +163,13 @@ bool _offer = false;
       },
     };
 
-    //     final Map<String, dynamic> mediaConstraints = {
-    //   'audio': true,
-    //   'video': false
-    // };
-
-    //var mediaConstraints = { 'audio': true, 'video': { 'width': 1280, 'height': 720 } };
-
-    print('YYYYY');
-
-   // MediaStream stream = await navigator.getUserMedia(mediaConstraints);
-   // MediaStream stream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
-  MediaStream stream = await navigator.getUserMedia(mediaConstraints);
-   // MediaStream stream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
-    print('ZZZZZZ');
+    MediaStream stream = await navigator.getUserMedia(mediaConstraints);
 
     // _localStream = stream;
-    print(stream);
-    print('AAAAA');
-
     _localRenderer.srcObject = stream;
-   // _localRenderer.mirror = true;
-    print('BBBBB');
+    _localRenderer.mirror = true;
 
-     //_peerConnection.addStream(stream);
+    // _peerConnection.addStream(stream);
 
     return stream;
   }
@@ -223,13 +185,13 @@ bool _offer = false;
             child: new RTCVideoView(_localRenderer)
           ),
         ),
-        // Flexible(
-        //   child: new Container(
-        //       key: new Key("remote"),
-        //       margin: new EdgeInsets.fromLTRB(5.0, 5.0, 5.0, 5.0),
-        //       decoration: new BoxDecoration(color: Colors.black),
-        //       child: new RTCVideoView(_remoteRenderer)),
-        // )
+        Flexible(
+          child: new Container(
+              key: new Key("remote"),
+              margin: new EdgeInsets.fromLTRB(5.0, 5.0, 5.0, 5.0),
+              decoration: new BoxDecoration(color: Colors.black),
+              child: new RTCVideoView(_remoteRenderer)),
+        )
       ]));
 
   Row offerAndAnswerButtons() =>
@@ -244,24 +206,24 @@ bool _offer = false;
           //         );
           //       });
           // },
-          onPressed: _createEvent,
-          child: Text('Create Event'),
+          onPressed: _createOffer,
+          child: Text('Offer'),
           color: Colors.amber,
         ),
-        // RaisedButton(
-        //   onPressed: _createAnswer,
-        //   child: Text('Answer'),
-        //   color: Colors.amber,
-        // ),
+        RaisedButton(
+          onPressed: _createAnswer,
+          child: Text('Answer'),
+          color: Colors.amber,
+        ),
       ]);
 
   Row sdpCandidateButtons() =>
       Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: <Widget>[
-        // RaisedButton(
-        //   onPressed: _setRemoteDescription,
-        //   child: Text('Set Remote Desc'),
-        //   color: Colors.amber,
-        // ),
+        RaisedButton(
+          onPressed: _setRemoteDescription,
+          child: Text('Set Remote Desc'),
+          color: Colors.amber,
+        ),
         RaisedButton(
           onPressed: _addCandidate,
           child: Text('Add Candidate'),
@@ -279,36 +241,18 @@ bool _offer = false;
         ),
       );
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Broadcast'),
-        //title: Text(widget.title),
-      ),
-      body: Container(
-                 decoration: BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage('assets/pytch_1125-1240.png'),
-              fit: BoxFit.cover,
-            ),
-          ),
-                child: Column(
-                  children: <Widget>[
-                    Expanded(
-                      child: Container(
-                        child:  Column(children: [
-         videoRenderers(),
-         offerAndAnswerButtons(),
-         sdpCandidatesTF(),
+        appBar: AppBar(
+          title: Text(widget.title),
+        ),
+        body: Container(
+            child: Column(children: [
+          videoRenderers(),
+          offerAndAnswerButtons(),
+          sdpCandidatesTF(),
           sdpCandidateButtons(),
-        ])
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-      );
+        ])));
   }
 }

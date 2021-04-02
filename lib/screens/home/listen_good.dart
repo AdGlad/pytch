@@ -11,115 +11,132 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pytch/services/db_event.dart';
 import 'package:uuid/uuid.dart';
+import 'package:pytch/models/event.dart';
 
 
-class BroadcastCopy extends StatefulWidget {
-  BroadcastCopy({Key key, this.title}) : super(key: key);
+class Listen extends StatefulWidget {
+
+final EventData event;
+
+  Listen({Key key, this.event, this.title}) : super(key: key);
   final String title;
   @override
-  _BroadcastCopyState createState() => _BroadcastCopyState();
+  _ListenState createState() => _ListenState();
 }
 
-class _BroadcastCopyState extends State<BroadcastCopy> {
+class _ListenState extends State<Listen> {
 bool _offer = false;
   RTCPeerConnection _peerConnection;
   MediaStream _localStream;
   RTCVideoRenderer _localRenderer = new RTCVideoRenderer();
-  RTCVideoRenderer _remoteRenderer = new RTCVideoRenderer();
+  //RTCVideoRenderer _remoteRenderer = new RTCVideoRenderer();
 
   final sdpController = TextEditingController();
 
   @override
   dispose() {
     _localRenderer.dispose();
-    _remoteRenderer.dispose();
+    // _remoteRenderer.dispose();
     sdpController.dispose();
     super.dispose();
   }
 
   @override
   void initState() {
-    initRenderers();
-    _createPeerConnection().then((pc) {
-      _peerConnection = pc;
-    });
+    // initRenderers();
+    // _createPeerConnection().then((pc) {
+    //   _peerConnection = pc;
+    // });
     super.initState();
   }
 
   initRenderers() async {
     await _localRenderer.initialize();
-    await _remoteRenderer.initialize();
+   // await _remoteRenderer.initialize();
   }
 
-  void _createEvent() async {
-    try {
-    var uuid = Uuid();
-    var eventid = uuid.v4();
-
-    RTCSessionDescription description =
-        await _peerConnection.createOffer({'offerToReceiveVideo': 1});
-    var session = parse(description.sdp);
-        print('ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ');
-    print(description.sdp);
-            print('ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ');
-    print(json.encode(session));
-        print('JJJJJJJJJJJJJJJJJJJJJJJJJ');
-
-    _offer = true;
-
-    _peerConnection.setLocalDescription(description);
-    //DbEventService(uid: eventid).createEventData('Manly round 3', 'offer', 'answer');
-    DbEventService(uid: eventid).createEventData('Manly round 3', '1234');
-    DbEventService(uid: eventid).updateEventoffer(description.type, json.encode(session));
+  void _showEvent() async {
+   
     print('******************************');
-    print(eventid);
+    print(widget.event.eventname);
+    print(widget.event.uid);
+    print(widget.event.offer);
     print('******************************');
-    //DbEventService(uid: null).updateEventofferData('Manly round 3', _offer, 'answer');
-    // events.add({
-    //   'event': 'Manly round 2',
-    //   'offer': {
-    //         'type': description.type,
-    //         'sdp':  description.sdp
-    //         }
-    //     })
-    //     .then((value) => print("Event Added")).
-    //     catchError((error) => print("Failed to add event: $error"));
 
-//const _eventId = events.id;
-//print(events[1].event);
-//#document.querySelector('#currentRoom').innerText = `Current room is ${roomId} - You are the caller!`
-    } catch (e) {
-      print(e.toString());
-    }
+
   }
 
   void _createAnswer() async {
-    RTCSessionDescription description =
-        await _peerConnection.createAnswer({'offerToReceiveVideo': 1});
+       print('_createAnswer AG');
+       initRenderers();
+       _createPeerConnection().then((pc){_peerConnection = pc;});
 
+     RTCSessionDescription description =
+         await _peerConnection.createAnswer({'offerToReceiveVideo': 1});
+     //DocumentSnapshot jsonString = await Firestore.instance.collection('events').document('0aba43ea-64f4-4e9a-9edc-bf24c4042898').get();
+     //DocumentSnapshot jsonString = await Firestore.instance.collection('events').document(widget.event.uid).get();
+    
+    //  print('##########################################');
+    //  print(jsonString.data['eventname']);
+    //  print(jsonString.data['offer']['sdp']);
+    //  print('##########################################');
+    // print('##########################################');
+    //  print(widget.event.eventname);
+    //  print(widget.event.offer);
+    //  print('##########################################');
+    //_showEvent();
     var session = parse(description.sdp);
-    print(json.encode(session));
-    // print(json.encode({
-    //       'sdp': description.sdp.toString(),
-    //       'type': description.type.toString(),
-    //     }));
+        print(json.encode(session));
+        print(json.encode({
+               'sdp': description.sdp.toString(),
+               'type': description.type.toString(),
+               }));
 
-    _peerConnection.setLocalDescription(description);
+     _peerConnection.setLocalDescription(description);
+     DbEventService(uid: widget.event.uid).updateEventanswer(description.type, json.encode(session));
   }
 
   void _setRemoteDescription() async {
+  print('_setRemoteDescription AG');
+    // This is where we need to apply SDP from Firebase
+    //DocumentSnapshot jsonString = await Firestore.instance.collection('events').document('0aba43ea-64f4-4e9a-9edc-bf24c4042898').get();
+    //DocumentSnapshot jsonString = await Firestore.instance.collection('events').document(widget.event.uid).get();
+    //String jsonString = await Firestore.instance.collection('events').document(widget.event.uid).get();
+     
+     //print(widget.event.eventname);
+    // print(widget.event.offer);
+
+    //dynamic session = await jsonDecode('$jsonString');
+
+    // AG   sdpController.text  = widget.event.offer;
+    
     String jsonString = sdpController.text;
     dynamic session = await jsonDecode('$jsonString');
+    //String session =widget.event.offer;
+    //String sdp = session;
 
     String sdp = write(session, null);
+    print('PPPPPPPPPPPPPPPPPPPPPPPP');
+    print(sdp);
+    print('PPPPPPPPPPPPPPPPPPPPPPPP');
 
     // RTCSessionDescription description =
     //     new RTCSessionDescription(session['sdp'], session['type']);
-    RTCSessionDescription description =
-        new RTCSessionDescription(sdp, _offer ? 'answer' : 'offer');
+    // RTCSessionDescription description =
+    //     new RTCSessionDescription(sdp, _offer ? 'answer' : 'offer');
+
+        RTCSessionDescription description =
+        new RTCSessionDescription(sdp, 'answer' );
+
+    print('##########################################');
     print(description.toMap());
+    print('##########################################');
 
     await _peerConnection.setRemoteDescription(description);
+    print('EEEEEEEEEEEEEEEEEE');
+
+
+
   }
 
   void _addCandidate() async {
@@ -132,10 +149,9 @@ bool _offer = false;
   }
 
   _createPeerConnection() async {
-    print('_createPeerConnection');
     Map<String, dynamic> configuration = {
       "iceServers": [
-        {"urls": "stun:stun.l.google.com:19302"},
+        {"url": "stun:stun.l.google.com:19302"},
       ]
     };
 
@@ -175,10 +191,10 @@ bool _offer = false;
     };
     print('55555555');
 
-    pc.onAddStream = (stream) {
-      print('addStream: ' + stream.id);
-      _remoteRenderer.srcObject = stream;
-    };
+    // pc.onAddStream = (stream) {
+    //   print('addStream: ' + stream.id);
+    //   _remoteRenderer.srcObject = stream;
+    // };
     print('666666');
 
     return pc;
@@ -207,15 +223,16 @@ bool _offer = false;
    // MediaStream stream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
    MediaStream stream = await navigator.getUserMedia(mediaConstraints);
     //MediaStream stream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
-    print('ZZZZZZ');
+   // print('ZZZZZZ');
+   // print('offer');
 
     // _localStream = stream;
-    print(stream);
-    print('AAAAA');
+   // print(stream);
+   // print('AAAAA');
 
     _localRenderer.srcObject = stream;
    // _localRenderer.mirror = true;
-    print('BBBBB');
+   // print('BBBBB');
 
      //_peerConnection.addStream(stream);
 
@@ -233,31 +250,23 @@ bool _offer = false;
             child: new RTCVideoView(_localRenderer)
           ),
         ),
-        Flexible(
-          child: new Container(
-              key: new Key("remote"),
-              margin: new EdgeInsets.fromLTRB(5.0, 5.0, 5.0, 5.0),
-              decoration: new BoxDecoration(color: Colors.black),
-              child: new RTCVideoView(_remoteRenderer)),
-        )
+        // Flexible(
+        //   child: new Container(
+        //       key: new Key("remote"),
+        //       margin: new EdgeInsets.fromLTRB(5.0, 5.0, 5.0, 5.0),
+        //       decoration: new BoxDecoration(color: Colors.black),
+        //       child: new RTCVideoView(_remoteRenderer)),
+        // )
       ]));
 
   Row offerAndAnswerButtons() =>
       Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: <Widget>[
-        new RaisedButton(
-          // onPressed: () {
-          //   return showDialog(
-          //       context: context,
-          //       builder: (context) {
-          //         return AlertDialog(
-          //           content: Text(sdpController.text),
-          //         );
-          //       });
-          // },
-          onPressed: _createEvent,
-          child: Text('Create Event'),
-          color: Colors.amber,
-        ),
+        new 
+        // RaisedButton(
+        //   onPressed: _showEvent,
+        //   child: Text('Show Event'),
+        //   color: Colors.amber,
+        // ),
         RaisedButton(
           onPressed: _createAnswer,
           child: Text('Answer'),
@@ -294,7 +303,7 @@ bool _offer = false;
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('BroadcastCopy'),
+        title: Text('Listen'),
         //title: Text(widget.title),
       ),
       body: Container(
@@ -309,11 +318,11 @@ bool _offer = false;
                     Expanded(
                       child: Container(
                         child:  Column(children: [
-         videoRenderers(),
-         offerAndAnswerButtons(),
-         sdpCandidatesTF(),
-          sdpCandidateButtons(),
-        ])
+                          videoRenderers(),
+                          offerAndAnswerButtons(),
+                          sdpCandidatesTF(),
+                          sdpCandidateButtons(),
+                         ])
                       ),
                     ),
                   ],

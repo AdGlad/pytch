@@ -13,14 +13,14 @@ import 'package:pytch/services/db_event.dart';
 import 'package:uuid/uuid.dart';
 
 
-class BroadcastCopy extends StatefulWidget {
-  BroadcastCopy({Key key, this.title}) : super(key: key);
+class Broadcastgood extends StatefulWidget {
+  Broadcastgood({Key key, this.title}) : super(key: key);
   final String title;
   @override
-  _BroadcastCopyState createState() => _BroadcastCopyState();
+  _BroadcastgoodState createState() => _BroadcastgoodState();
 }
 
-class _BroadcastCopyState extends State<BroadcastCopy> {
+class _BroadcastgoodState extends State<Broadcastgood> {
 bool _offer = false;
   RTCPeerConnection _peerConnection;
   MediaStream _localStream;
@@ -39,10 +39,10 @@ bool _offer = false;
 
   @override
   void initState() {
-    initRenderers();
-    _createPeerConnection().then((pc) {
-      _peerConnection = pc;
-    });
+    // initRenderers();
+    // _createPeerConnection().then((pc) {
+    //   _peerConnection = pc;
+    // });
     super.initState();
   }
 
@@ -55,15 +55,18 @@ bool _offer = false;
     try {
     var uuid = Uuid();
     var eventid = uuid.v4();
-
+    initRenderers();
+    _createPeerConnection().then((pc) {
+      _peerConnection = pc;
+      });
     RTCSessionDescription description =
         await _peerConnection.createOffer({'offerToReceiveVideo': 1});
     var session = parse(description.sdp);
-        print('ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ');
+    print('HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH');
     print(description.sdp);
-            print('ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ');
+    print('SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS');
     print(json.encode(session));
-        print('JJJJJJJJJJJJJJJJJJJJJJJJJ');
+    print('SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS');
 
     _offer = true;
 
@@ -74,53 +77,39 @@ bool _offer = false;
     print('******************************');
     print(eventid);
     print('******************************');
-    //DbEventService(uid: null).updateEventofferData('Manly round 3', _offer, 'answer');
-    // events.add({
-    //   'event': 'Manly round 2',
-    //   'offer': {
-    //         'type': description.type,
-    //         'sdp':  description.sdp
-    //         }
-    //     })
-    //     .then((value) => print("Event Added")).
-    //     catchError((error) => print("Failed to add event: $error"));
-
-//const _eventId = events.id;
-//print(events[1].event);
 //#document.querySelector('#currentRoom').innerText = `Current room is ${roomId} - You are the caller!`
     } catch (e) {
       print(e.toString());
     }
   }
 
-  void _createAnswer() async {
-    RTCSessionDescription description =
-        await _peerConnection.createAnswer({'offerToReceiveVideo': 1});
+  // void _createAnswer() async {
+  //   RTCSessionDescription description =
+  //       await _peerConnection.createAnswer({'offerToReceiveVideo': 1});
 
-    var session = parse(description.sdp);
-    print(json.encode(session));
-    // print(json.encode({
-    //       'sdp': description.sdp.toString(),
-    //       'type': description.type.toString(),
-    //     }));
+  //   var session = parse(description.sdp);
+  //   print(json.encode(session));
+  //   // print(json.encode({
+  //   //       'sdp': description.sdp.toString(),
+  //   //       'type': description.type.toString(),
+  //   //     }));
 
-    _peerConnection.setLocalDescription(description);
-  }
+  //   _peerConnection.setLocalDescription(description);
+  // }
 
-  void _setRemoteDescription() async {
-    String jsonString = sdpController.text;
-    dynamic session = await jsonDecode('$jsonString');
+  // void _setRemoteDescription() async {
+  //   String jsonString = sdpController.text;
+  //   dynamic session = await jsonDecode('$jsonString');
 
-    String sdp = write(session, null);
+  //   String sdp = write(session, null);
 
-    // RTCSessionDescription description =
-    //     new RTCSessionDescription(session['sdp'], session['type']);
-    RTCSessionDescription description =
-        new RTCSessionDescription(sdp, _offer ? 'answer' : 'offer');
-    print(description.toMap());
 
-    await _peerConnection.setRemoteDescription(description);
-  }
+  //   RTCSessionDescription description =
+  //       new RTCSessionDescription(sdp, _offer ? 'answer' : 'offer');
+  //   print(description.toMap());
+
+  //   await _peerConnection.setRemoteDescription(description);
+  // }
 
   void _addCandidate() async {
     String jsonString = sdpController.text;
@@ -159,6 +148,7 @@ bool _offer = false;
     // if (pc != null) print(pc);
     pc.addStream(_localStream);
     print('333333333');
+    // This appears to be where the candidate is generated. loops for each candidate
     pc.onIceCandidate = (e) {
       if (e.candidate != null) {
         print(json.encode({
@@ -205,8 +195,8 @@ bool _offer = false;
 
    // MediaStream stream = await navigator.getUserMedia(mediaConstraints);
    // MediaStream stream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
-   MediaStream stream = await navigator.getUserMedia(mediaConstraints);
-    //MediaStream stream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
+  MediaStream stream = await navigator.getUserMedia(mediaConstraints);
+   // MediaStream stream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
     print('ZZZZZZ');
 
     // _localStream = stream;
@@ -233,13 +223,13 @@ bool _offer = false;
             child: new RTCVideoView(_localRenderer)
           ),
         ),
-        Flexible(
-          child: new Container(
-              key: new Key("remote"),
-              margin: new EdgeInsets.fromLTRB(5.0, 5.0, 5.0, 5.0),
-              decoration: new BoxDecoration(color: Colors.black),
-              child: new RTCVideoView(_remoteRenderer)),
-        )
+        // Flexible(
+        //   child: new Container(
+        //       key: new Key("remote"),
+        //       margin: new EdgeInsets.fromLTRB(5.0, 5.0, 5.0, 5.0),
+        //       decoration: new BoxDecoration(color: Colors.black),
+        //       child: new RTCVideoView(_remoteRenderer)),
+        // )
       ]));
 
   Row offerAndAnswerButtons() =>
@@ -258,20 +248,20 @@ bool _offer = false;
           child: Text('Create Event'),
           color: Colors.amber,
         ),
-        RaisedButton(
-          onPressed: _createAnswer,
-          child: Text('Answer'),
-          color: Colors.amber,
-        ),
+        // RaisedButton(
+        //   onPressed: _createAnswer,
+        //   child: Text('Answer'),
+        //   color: Colors.amber,
+        // ),
       ]);
 
   Row sdpCandidateButtons() =>
       Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: <Widget>[
-        RaisedButton(
-          onPressed: _setRemoteDescription,
-          child: Text('Set Remote Desc'),
-          color: Colors.amber,
-        ),
+        // RaisedButton(
+        //   onPressed: _setRemoteDescription,
+        //   child: Text('Set Remote Desc'),
+        //   color: Colors.amber,
+        // ),
         RaisedButton(
           onPressed: _addCandidate,
           child: Text('Add Candidate'),
@@ -294,7 +284,7 @@ bool _offer = false;
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('BroadcastCopy'),
+        title: Text('Broadcastgood'),
         //title: Text(widget.title),
       ),
       body: Container(

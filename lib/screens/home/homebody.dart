@@ -3,6 +3,8 @@ import 'package:flutter/semantics.dart';
 import 'package:pytch/screens/Vapors/user_list.dart';
 import 'package:pytch/screens/Events/event_list.dart';
 //import 'package:pytch/screens/home/settings_form.dart';
+import 'package:pytch/screens/home/broadcast.dart';
+
 import 'broadcast.dart';
 
 class Homebody extends StatelessWidget {
@@ -26,7 +28,7 @@ class Homebody extends StatelessWidget {
     print('The value of the index is: $index');
     if (index == 0)
       { 
-        Navigator.push(context, MaterialPageRoute(builder: (context) => Broadcast()));
+        Navigator.push(context, MaterialPageRoute(builder: (context) => Broadcast(title: 'WebRTC lets learn together')));
     } else if (index == 1)
     {
        Navigator.push(context, MaterialPageRoute(builder: (context) => UserList() ));

@@ -1,10 +1,13 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-//import 'package:flutter_webrtc/web/rtc_session_description.dart';
+// import 'package:flutter_webrtc/web/rtc_session_description.dart';
 import 'package:flutter_webrtc/webrtc.dart';
-//import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:sdp_transform/sdp_transform.dart';
+import 'package:pytch/services/db_event.dart';
+// AG
+import 'package:uuid/uuid.dart';
+// AG
 
 void main() {
   runApp(MyApp());
@@ -67,6 +70,10 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _createOffer() async {
+    // AG
+    var uuid = Uuid();
+    var eventid = uuid.v4();
+    // AG
     RTCSessionDescription description =
         await _peerConnection.createOffer({'offerToReceiveVideo': 1});
     var session = parse(description.sdp);
@@ -79,6 +86,10 @@ class _MyHomePageState extends State<MyHomePage> {
     //     }));
 
     _peerConnection.setLocalDescription(description);
+    // AG
+    DbEventService(uid: eventid).createEventData('Manly round 3', '1234');
+    DbEventService(uid: eventid).updateEventoffer(description.type, json.encode(session));
+    // AG
   }
 
   void _createAnswer() async {
@@ -170,12 +181,11 @@ class _MyHomePageState extends State<MyHomePage> {
       },
     };
 
-    //MediaStream stream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
     MediaStream stream = await navigator.getUserMedia(mediaConstraints);
 
     // _localStream = stream;
     _localRenderer.srcObject = stream;
-    //_localRenderer.mirror = true;
+    _localRenderer.mirror = true;
 
     // _peerConnection.addStream(stream);
 
@@ -264,4 +274,3 @@ class _MyHomePageState extends State<MyHomePage> {
         ])));
   }
 }
-
