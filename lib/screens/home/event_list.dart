@@ -14,7 +14,7 @@ class _EventListState extends State<EventsList> {
 
     final events = Provider.of<List<EventData>>(context) ?? [];
     events.forEach((event) { 
-     print(event.uid);
+     print(event.id);
      print(event.eventname);
      print(event.offer);
      print(event.answer);

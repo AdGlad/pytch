@@ -75,8 +75,8 @@ class _ListenState extends State<Listen> {
 
     _peerConnection.setLocalDescription(description);
     // AG
-    DbEventService(uid: eventid).createEventData('Manly round 3', '1234');
-    DbEventService(uid: eventid).updateEventoffer(description.type, json.encode(session));
+    // DbEventService(uid: eventid).createEventData('Manly round 3', '1234');
+    // DbEventService(uid: eventid).updateEventoffer(description.type, json.encode(session));
     // AG
   }
 
@@ -92,6 +92,9 @@ class _ListenState extends State<Listen> {
     //     }));
 
     _peerConnection.setLocalDescription(description);
+    // AG
+    DbEventService(uid: widget.event.id).updateEventanswer(description.type, json.encode(session));
+    // AG
   }
 
   void _setRemoteDescription() async {

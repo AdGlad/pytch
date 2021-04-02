@@ -48,6 +48,7 @@ DbEventService({this.uid});
  List<EventData> _eventdataListFromSnapshot(QuerySnapshot snapshot) {
    return snapshot.documents.map((doc){
      return EventData(
+       id: doc.documentID,
        eventname: doc.data['eventname'] ?? '',
        offer: doc.data['offer']['sdp'] ?? '',
       // answer: doc.data['answer'] ?? '',
@@ -64,7 +65,7 @@ DbEventService({this.uid});
 
 EventData _eventDataFromSnapshot(DocumentSnapshot snapshot) {
   return EventData(
-    uid: uid,
+    id: uid,
     eventname: snapshot.data['eventname'],
     offer: snapshot.data['offer']['sdp'],
    // answer: snapshot.data['answer'],

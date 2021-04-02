@@ -59,7 +59,7 @@ bool _offer = false;
    
     print('******************************');
     print(widget.event.eventname);
-    print(widget.event.uid);
+    print(widget.event.id);
     print(widget.event.offer);
     print('******************************');
 
@@ -93,7 +93,7 @@ bool _offer = false;
                }));
 
      _peerConnection.setLocalDescription(description);
-     DbEventService(uid: widget.event.uid).updateEventanswer(description.type, json.encode(session));
+     DbEventService(uid: widget.event.id).updateEventanswer(description.type, json.encode(session));
   }
 
   void _setRemoteDescription() async {

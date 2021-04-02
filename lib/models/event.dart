@@ -1,17 +1,17 @@
 class Event {
-  final String uid;
+  final String id;
 
-  Event({this.uid});
+  Event({this.id});
 
 }
 
 class EventData {
-  final String uid;
+  final String id;
   final String eventname;
   final String offer;
   final String answer;
 
 
-  EventData({this.uid,this.eventname,this.offer,this.answer});
+  EventData({this.id,this.eventname,this.offer,this.answer});
 
 }
