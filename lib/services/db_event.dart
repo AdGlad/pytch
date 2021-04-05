@@ -32,6 +32,17 @@ DbEventService({this.uid});
         },
     }).then((value) => print("Event updated with answer")).catchError((error) => print("Failed to update answer: $error"));
  }
+        Future<void> updateEventcandidate(
+                               String candidatetype,
+                               String candidatesdp,
+                               ) async {
+      return await eventCollection.document(uid).updateData({
+        'candidate': {
+          'type': candidatetype,
+          'sdp':  candidatesdp
+        },
+    }).then((value) => print("Event updated with candidate")).catchError((error) => print("Failed to update candidate: $error"));
+ }
 
 
         Future<void> createEventData(

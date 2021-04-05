@@ -7,7 +7,9 @@ import 'package:sdp_transform/sdp_transform.dart';
 // AG
 import 'package:pytch/services/db_event.dart';
 import 'package:pytch/models/event.dart';
+import 'package:pytch/models/candidate.dart';
 import 'package:uuid/uuid.dart';
+import 'dart:convert';
 // AG
 
 class Listen extends StatefulWidget {
@@ -23,6 +25,8 @@ class Listen extends StatefulWidget {
 
 class _ListenState extends State<Listen> {
 
+
+
   bool _offer = false;
   RTCPeerConnection _peerConnection;
   MediaStream _localStream;
@@ -30,6 +34,7 @@ class _ListenState extends State<Listen> {
   RTCVideoRenderer _remoteRenderer = new RTCVideoRenderer();
   //EventData eventdata;
   final sdpController = TextEditingController();
+  String _candidates;
 
   @override
   dispose() {
@@ -85,7 +90,8 @@ class _ListenState extends State<Listen> {
         await _peerConnection.createAnswer({'offerToReceiveVideo': 1});
 
     var session = parse(description.sdp);
-    print(json.encode(session));
+
+    //print(json.encode(session));
     // print(json.encode({
     //       'sdp': description.sdp.toString(),
     //       'type': description.type.toString(),
@@ -94,7 +100,30 @@ class _ListenState extends State<Listen> {
     _peerConnection.setLocalDescription(description);
     // AG
     DbEventService(uid: widget.event.id).updateEventanswer(description.type, json.encode(session));
+    //String _candidate;
+    //dynamic _candidatejson;
+
+    // _candidate = write(_candidatejson, null);
+
+    //_peerConnection.onIceCandidate = (e) {
+    //  if (e.candidate != null) {
+    //    _candidate = json.encode({'candidate': e.candidate.toString()});
+        //_candidatejson = json.encode({'candidate': e.candidate.toString()});
+       // _candidate = write(_candidatejson, null);
+        //DbEventService(uid: widget.event.id).updateEventcandidate(description.type, e.candidate.toString());
+    //    DbEventService(uid: widget.event.id).updateEventcandidate(description.type, _candidate);
+
+     //   print('RRRRRRRRRRRRRRRRRRRRR');
+    //    print(json.encode({
+    //      'candidate': e.candidate.toString(),
+          // 'sdpMid': e.sdpMid.toString(),
+          // 'sdpMlineIndex': e.sdpMlineIndex,
+    //    }));
+    //    print('KRRRRRRRRRRRRRRRRR');
+     // }
+    //};
     // AG
+
   }
 
   void _setRemoteDescription() async {
@@ -141,16 +170,60 @@ class _ListenState extends State<Listen> {
     RTCPeerConnection pc = await createPeerConnection(configuration, offerSdpConstraints);
     // if (pc != null) print(pc);
     pc.addStream(_localStream);
+     //List<Candidate> candidate;
+       //List<String> candidate;
+     int _index = 0;
 
-    pc.onIceCandidate = (e) {
-      if (e.candidate != null) {
-        print(json.encode({
-          'candidate': e.candidate.toString(),
-          'sdpMid': e.sdpMid.toString(),
-          'sdpMlineIndex': e.sdpMlineIndex,
-        }));
-      }
-    };
+
+      pc.onIceCandidate = (e) {
+
+          print('AAAAAAAAAAAAAAAAAAAAA');
+     //     candidate[0] ='1';
+          // candidate[_index] = '1';
+           _index = _index+1;
+           print(_index.toString());
+    //       print(e.toString());
+         print('AAAAAAAAAAAAAAAAAAAAA');
+    //   if (e.candidate != null) {
+    //      //candidate[_index] = Candidate(e.candidate.toString(),e.sdpMid.toString(),e.sdpMlineIndex);
+    //      //candidate[_index] = Candidate(e.candidate,e.sdpMid,e.sdpMlineIndex);
+
+    //       _index = _index+1;
+    //       print('KKKKKKKKKKKKKKKKKKKKKKKK');
+    //     // candidate[_index] = json.encode({
+    //     //           'candidate': e.candidate.toString(),
+    //     //          'sdpMid': e.sdpMid.toString(),
+    //     //          'sdpMlineIndex': e.sdpMlineIndex,
+    //     // });
+          if (_index == 1) {  
+
+                DbEventService(uid: widget.event.id).updateEventcandidate('candidate',
+                     json.encode({
+                     'candidate': e.candidate.toString(),
+                      'sdpMid': e.sdpMid.toString(),
+                    'sdpMlineIndex': e.sdpMlineIndex,
+                    })
+                );
+           }
+
+    //       print(
+    //         json.encode({
+    //         'candidate': e.candidate.toString(),
+    //         'sdpMid': e.sdpMid.toString(),
+    //         'sdpMlineIndex': e.sdpMlineIndex,
+    //       })
+    //       );
+    //     // _candidates = _candidates +
+    //     //  json.encode({'candidate': e.candidate.toString(),'sdpMid': e.sdpMid.toString(),'sdpMlineIndex': e.sdpMlineIndex,}) +
+    //     //  ',';
+
+    //     print('KKKKKKKKKKKKKKKKKKKKKKKK');
+    //   }
+     };
+    // print(_candidates);
+    // print('SSSSSSSSSSSSSSSSSSSSSSSS');
+    // print(candidate);
+    // print('SSSSSSSSSSSSSSSSSSSSSSSS');
 
     pc.onIceConnectionState = (e) {
       print(e);
