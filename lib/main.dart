@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:pytch/screens/home/testpage.dart';
 import 'screens/wapper.dart';
 import 'services/auth.dart';
 import 'models/user.dart';
@@ -18,7 +19,8 @@ class MyApp extends StatelessWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
             debugShowCheckedModeBanner: false,
-            home: Wrapper(),
+           // home: Wrapper(),
+            home: testpage(),
       ),
     );
   }

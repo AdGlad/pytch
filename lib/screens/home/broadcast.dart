@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/webrtc.dart';
 import 'package:sdp_transform/sdp_transform.dart';
 import 'package:pytch/services/db_event.dart';
+import 'package:provider/provider.dart';
 // AG
 import 'package:uuid/uuid.dart';
 // AG
