@@ -1,5 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+//import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pytch/models/user.dart';
 import 'package:pytch/services/db_user.dart';
 
@@ -7,12 +7,12 @@ class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   // Create user object based on FirebaseUser
 
-  User _userFromFirebaseUser(FirebaseUser user){
-    return user !=null ? User(uid: user.uid) : null;
+  UserLocal _userFromFirebaseUser(User user){
+    return user !=null ? UserLocal(uid: user.uid) : null;
   }
   // Stream
-  Stream<User> get user {
-    return _auth.onAuthStateChanged
+  Stream<UserLocal> get user {
+    return _auth.authStateChanges()
     .map(_userFromFirebaseUser);
 
   }
@@ -20,8 +20,9 @@ class AuthService {
 Future registerWithEmailAndPassword(String email, String password) async
 { 
   try {
-    AuthResult result = await _auth.createUserWithEmailAndPassword(email: email, password: password);
-    FirebaseUser user = result.user;
+    UserCredential result = await _auth.createUserWithEmailAndPassword(email: email, password: password);
+    final user = result.user;
+    //FirebaseUser user = result.user;
     await DbUserService(uid: user.uid).updateUserData('firstname', 'lastname', 'nickname', 'M' );
     return _userFromFirebaseUser(user);
   }
@@ -34,8 +35,8 @@ Future registerWithEmailAndPassword(String email, String password) async
 Future signInWithEmailAndPassword(String email, String password) async
 { 
   try {
-    AuthResult result = await _auth.signInWithEmailAndPassword(email: email, password: password);
-    FirebaseUser user = result.user;
+    UserCredential result = await _auth.signInWithEmailAndPassword(email: email, password: password);
+    User user = result.user;
     return _userFromFirebaseUser(user);
   }
   catch(e) {
@@ -56,8 +57,8 @@ Future signOut() async {
   // Anon signin
   Future signInAnon() async {
     try {
-      AuthResult result = await _auth.signInAnonymously();
-      FirebaseUser user = result.user;
+      UserCredential result = await _auth.signInAnonymously();
+      User user = result.user;
       return _userFromFirebaseUser(user);
     } catch(e) {
       print(e.toString());

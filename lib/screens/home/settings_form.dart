@@ -21,7 +21,7 @@ class _SettingsFormState extends State<SettingsForm> {
 
   @override
   Widget build(BuildContext context) {
-    User user = Provider.of<User>(context);
+  UserLocal user = Provider.of<UserLocal>(context);
     return StreamBuilder<UserData>(
       stream: DbUserService(uid: user.uid).userData,
       builder: (context, snapshot) {

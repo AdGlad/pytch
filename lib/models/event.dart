@@ -31,21 +31,23 @@ class EventData {
   final String offer;
   final String answer;
   final String candidate;
-  List<Answer> answers;
+  //List<Answer> answers;
 
 
-  EventData({this.id,this.eventname,this.offer,this.answer,this.candidate,this.answers});
+  //EventData({this.id,this.eventname,this.offer,this.answer,this.candidate,this.answers});
+  EventData({this.id,this.eventname,this.offer,this.answer,this.candidate});
 
   factory EventData.fromJson(dynamic json) {
     if (json['answers'] != null) {
-        var answerlist = json["answers"] as List;
-        List<Answer> _answers = answerlist.map( (answerjson) => Answer.fromJson(answerjson) ).toList();
+        //var answerlist = json["answers"] as List;
+        //List<Answer> _answers = answerlist.map( (answerjson) => Answer.fromJson(answerjson) ).toList();
           return EventData(id: json['id'] as String,
                  eventname: json['eventname'] as String,
                  offer: json['offer'] as String,
                  answer: json['answer'] as String,
                  candidate: json['candidate'] as String,
-                 answers: _answers);
+                 //answers: _answers
+                 );
     } else {
           return EventData(id: json['id'] as String,
                  eventname: json['eventname'] as String,
@@ -57,7 +59,9 @@ class EventData {
 
   @override
   String toString() {
-    return '{ ${this.id}, ${this.eventname},${this.offer}, ${this.answer}, ${this.candidate}, ${this.answers} }';
+    return '{ ${this.id}, ${this.eventname},${this.offer}, ${this.answer}, ${this.candidate} }';
+    //,${this.answers} 
+   
   }
 
 }

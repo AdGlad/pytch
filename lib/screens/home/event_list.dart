@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:pytch/screens/home/event_tile.dart';
@@ -13,6 +14,7 @@ class _EventListState extends State<EventsList> {
   Widget build(BuildContext context) {
 
     final events = Provider.of<List<EventData>>(context) ?? [];
+    print(events);
     events.forEach((event) { 
      print('DDDDDDDDDDDDDDDDDDDD');
      print(event.id);
@@ -21,15 +23,15 @@ class _EventListState extends State<EventsList> {
      print(event.answer);
      print(event.candidate);
      print('DDDDDDDDDDDDDDDDDDDD');
-
     });
     
-    return ListView.builder(
+    return 
+    ListView.builder(
       itemCount: events.length,
       itemBuilder: (context,index){
-        return EventDataTile(event: events[index]);
+        return 
+        EventDataTile(event: events[index]);
       },
-      
     );
   }
 }

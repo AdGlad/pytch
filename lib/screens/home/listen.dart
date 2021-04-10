@@ -99,6 +99,9 @@ class _ListenState extends State<Listen> {
 
     _peerConnection.setLocalDescription(description);
     // AG
+    print(widget.event.id);
+    print(widget.event.eventname);
+
     DbEventService(uid: widget.event.id).updateEventanswer(description.type, json.encode(session));
     //String _candidate;
     //dynamic _candidatejson;

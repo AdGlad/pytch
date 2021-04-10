@@ -1,6 +1,6 @@
-class User {
+class UserLocal {
   final String uid;
-  User({this.uid});
+  UserLocal({this.uid});
 }
 
 class UserData {
