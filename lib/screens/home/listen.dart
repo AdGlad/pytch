@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 // import 'package:flutter_webrtc/web/rtc_session_description.dart';
 import 'package:flutter_webrtc/webrtc.dart';
@@ -103,29 +102,6 @@ class _ListenState extends State<Listen> {
     print(widget.event.eventname);
 
     DbEventService(uid: widget.event.id).updateEventanswer(description.type, json.encode(session));
-    //String _candidate;
-    //dynamic _candidatejson;
-
-    // _candidate = write(_candidatejson, null);
-
-    //_peerConnection.onIceCandidate = (e) {
-    //  if (e.candidate != null) {
-    //    _candidate = json.encode({'candidate': e.candidate.toString()});
-        //_candidatejson = json.encode({'candidate': e.candidate.toString()});
-       // _candidate = write(_candidatejson, null);
-        //DbEventService(uid: widget.event.id).updateEventcandidate(description.type, e.candidate.toString());
-    //    DbEventService(uid: widget.event.id).updateEventcandidate(description.type, _candidate);
-
-     //   print('RRRRRRRRRRRRRRRRRRRRR');
-    //    print(json.encode({
-    //      'candidate': e.candidate.toString(),
-          // 'sdpMid': e.sdpMid.toString(),
-          // 'sdpMlineIndex': e.sdpMlineIndex,
-    //    }));
-    //    print('KRRRRRRRRRRRRRRRRR');
-     // }
-    //};
-    // AG
 
   }
 
@@ -173,33 +149,8 @@ class _ListenState extends State<Listen> {
     RTCPeerConnection pc = await createPeerConnection(configuration, offerSdpConstraints);
     // if (pc != null) print(pc);
     pc.addStream(_localStream);
-     //List<Candidate> candidate;
-       //List<String> candidate;
-     int _index = 0;
-
 
       pc.onIceCandidate = (e) {
-
-          print('AAAAAAAAAAAAAAAAAAAAA');
-     //     candidate[0] ='1';
-          // candidate[_index] = '1';
-           _index = _index+1;
-           print(_index.toString());
-    //       print(e.toString());
-         print('AAAAAAAAAAAAAAAAAAAAA');
-    //   if (e.candidate != null) {
-    //      //candidate[_index] = Candidate(e.candidate.toString(),e.sdpMid.toString(),e.sdpMlineIndex);
-    //      //candidate[_index] = Candidate(e.candidate,e.sdpMid,e.sdpMlineIndex);
-
-    //       _index = _index+1;
-    //       print('KKKKKKKKKKKKKKKKKKKKKKKK');
-    //     // candidate[_index] = json.encode({
-    //     //           'candidate': e.candidate.toString(),
-    //     //          'sdpMid': e.sdpMid.toString(),
-    //     //          'sdpMlineIndex': e.sdpMlineIndex,
-    //     // });
-          if (_index == 1) {  
-
                 DbEventService(uid: widget.event.id).updateEventcandidate('candidate',
                      json.encode({
                      'candidate': e.candidate.toString(),
@@ -207,26 +158,7 @@ class _ListenState extends State<Listen> {
                     'sdpMlineIndex': e.sdpMlineIndex,
                     })
                 );
-           }
-
-    //       print(
-    //         json.encode({
-    //         'candidate': e.candidate.toString(),
-    //         'sdpMid': e.sdpMid.toString(),
-    //         'sdpMlineIndex': e.sdpMlineIndex,
-    //       })
-    //       );
-    //     // _candidates = _candidates +
-    //     //  json.encode({'candidate': e.candidate.toString(),'sdpMid': e.sdpMid.toString(),'sdpMlineIndex': e.sdpMlineIndex,}) +
-    //     //  ',';
-
-    //     print('KKKKKKKKKKKKKKKKKKKKKKKK');
-    //   }
-     };
-    // print(_candidates);
-    // print('SSSSSSSSSSSSSSSSSSSSSSSS');
-    // print(candidate);
-    // print('SSSSSSSSSSSSSSSSSSSSSSSS');
+           };
 
     pc.onIceConnectionState = (e) {
       print(e);
