@@ -150,14 +150,19 @@ class _ListenState extends State<Listen> {
     // if (pc != null) print(pc);
     pc.addStream(_localStream);
 
+    bool _firstCandidate = true;
+
       pc.onIceCandidate = (e) {
+
+        if (_firstCandidate) {
+          _firstCandidate = false;
                 DbEventService(uid: widget.event.id).updateEventcandidate('candidate',
                      json.encode({
                      'candidate': e.candidate.toString(),
                       'sdpMid': e.sdpMid.toString(),
                     'sdpMlineIndex': e.sdpMlineIndex,
                     })
-                );
+                );        }
            };
 
     pc.onIceConnectionState = (e) {

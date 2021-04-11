@@ -72,6 +72,22 @@ class _BroadcastState extends State<Broadcast> {
     print(eventid);
     DbEventService(uid: eventid).createEventData('Manly round 5', '1234');
     DbEventService(uid: eventid).updateEventoffer(description.type, json.encode(session));
+    print('herrrrrrrrrrrrrrrrre');
+
+
+       DbEventService(uid: eventid).eventData.listen((event) {
+        print('event');
+         print(event);
+         print('answer');
+         print(event.answer);
+         print('Value from controller: event');
+         print('candidate');
+         print(event.candidate);
+         sdpController.text = event.answer;
+         //.toString();
+
+       });
+
     // AG
   }
 

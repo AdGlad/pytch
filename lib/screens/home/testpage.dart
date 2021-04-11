@@ -1,6 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:pytch/models/eventanswer.dart';
+import 'package:pytch/services/db_event.dart';
 
 Future<void> addfirestore(var ref) {
       // Call the user's CollectionReference to add a new user
@@ -134,6 +138,24 @@ class _TestPageState extends State<TestPage> {
   //  // initializeFlutterFire();
   //   super.initState();
   // }
+  // 
+
+   @override
+   void initState() {
+  
+     String eventid = '58be842f-65d6-46c6-bd32-35ba1d5a6f4b';
+
+       DbEventService(uid: eventid).eventData.listen((event) {
+        print('event');
+         print(event);
+         print('answer');
+         //print(event.answer);
+         print('Value from controller: event');
+       });
+  //    //   print('Value from controller: $value');
+  // 
+     super.initState();
+   }
 
   @override
 Widget build(BuildContext context) {
