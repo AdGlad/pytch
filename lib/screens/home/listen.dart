@@ -50,7 +50,8 @@ class _ListenState extends State<Listen> {
       _peerConnection = pc;
     // AG
     sdpController.text = widget.event.offer;
-
+    _setRemoteDescription();
+    _createAnswer();
     // AG
     });
     super.initState();
@@ -59,6 +60,10 @@ class _ListenState extends State<Listen> {
   initRenderers() async {
     await _localRenderer.initialize();
     await _remoteRenderer.initialize();
+
+
+
+
   }
 
   void _createOffer() async {
@@ -104,6 +109,7 @@ class _ListenState extends State<Listen> {
     DbEventService(uid: widget.event.id).updateEventanswer(description.type, json.encode(session));
 
   }
+
 
   void _setRemoteDescription() async {
     String jsonString = sdpController.text;
@@ -218,23 +224,23 @@ class _ListenState extends State<Listen> {
 
   Row offerAndAnswerButtons() =>
       Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: <Widget>[
-        new RaisedButton(
-          // onPressed: () {
-          //   return showDialog(
-          //       context: context,
-          //       builder: (context) {
-          //         return AlertDialog(
-          //           content: Text(sdpController.text),
-          //         );
-          //       });
-          // },
-          onPressed: _createOffer,
-          child: Text('Offer'),
-          color: Colors.amber,
-        ),
+        // new RaisedButton(
+        //   // onPressed: () {
+        //   //   return showDialog(
+        //   //       context: context,
+        //   //       builder: (context) {
+        //   //         return AlertDialog(
+        //   //           content: Text(sdpController.text),
+        //   //         );
+        //   //       });
+        //   // },
+        //   onPressed: _createOffer,
+        //   child: Text('Offer'),
+        //   color: Colors.amber,
+        // ),
         RaisedButton(
           onPressed: _createAnswer,
-          child: Text('Answer'),
+          child: Text('Listen'),
           color: Colors.amber,
         ),
       ]);
@@ -270,11 +276,17 @@ class _ListenState extends State<Listen> {
           title: Text(widget.title),
         ),
         body: Container(
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage('assets/pytch_1125-1240.png'),
+              fit: BoxFit.cover,
+            ),
+          ),
             child: Column(children: [
           videoRenderers(),
           offerAndAnswerButtons(),
-          sdpCandidatesTF(),
-          sdpCandidateButtons(),
+         // sdpCandidatesTF(),
+         // sdpCandidateButtons(),
         ])));
   }
 }

@@ -83,7 +83,20 @@ class _BroadcastState extends State<Broadcast> {
          print('Value from controller: event');
          print('candidate');
          print(event.candidate);
-         sdpController.text = event.answer;
+
+         if (event.answer.isNotEmpty )
+         {
+           sdpController.text = event.answer;
+           _setRemoteDescription();
+         }
+
+         if (event.candidate.isNotEmpty )
+         {
+           sdpController.text = event.candidate;
+           _addCandidate();
+         }
+
+         
          //.toString();
 
        });
@@ -224,15 +237,16 @@ class _BroadcastState extends State<Broadcast> {
           //       });
           // },
           onPressed: _createOffer,
-          child: Text('Offer'),
+          child: Text('Broadcast'),
           color: Colors.amber,
         ),
-        RaisedButton(
-          onPressed: _createAnswer,
-          child: Text('Answer'),
-          color: Colors.amber,
-        ),
-      ]);
+        // RaisedButton(
+        //   onPressed: _createAnswer,
+        //   child: Text('Answer'),
+        //   color: Colors.amber,
+        // ),
+      ]
+      );
 
   Row sdpCandidateButtons() =>
       Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: <Widget>[
@@ -265,11 +279,17 @@ class _BroadcastState extends State<Broadcast> {
           title: Text(widget.title),
         ),
         body: Container(
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage('assets/pytch_1125-1240.png'),
+              fit: BoxFit.cover,
+            ),
+          ),
             child: Column(children: [
           videoRenderers(),
           offerAndAnswerButtons(),
-          sdpCandidatesTF(),
-          sdpCandidateButtons(),
+         // sdpCandidatesTF(),
+          //sdpCandidateButtons(),
         ])));
   }
 }

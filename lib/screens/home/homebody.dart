@@ -28,7 +28,7 @@ class Homebody extends StatelessWidget {
     print('The value of the index is: $index');
     if (index == 0)
       { 
-        Navigator.push(context, MaterialPageRoute(builder: (context) => Broadcast(title: 'WebRTC lets learn together')));
+        Navigator.push(context, MaterialPageRoute(builder: (context) => Broadcast(title: 'Pytch')));
     } else if (index == 1)
     {
        Navigator.push(context, MaterialPageRoute(builder: (context) => UserList() ));

@@ -16,11 +16,11 @@ class EventDataTile extends StatelessWidget {
           //onTap: () {print('Heeellllllo');},
           onTap: () {
             Navigator.push(context,
-            MaterialPageRoute(builder: (context) => Listen(title: 'WebRTC lets learn together',event: event)));
+            MaterialPageRoute(builder: (context) => Listen(title: 'Pytch',event: event)));
           },
           leading: CircleAvatar(
             radius: 25.0,
-            backgroundImage: AssetImage('assets/atomizer.png'),
+            backgroundImage: AssetImage('assets/icon.png'),
             ),
             title: Text(event.eventname ,
                  style: TextStyle(
@@ -29,7 +29,7 @@ class EventDataTile extends StatelessWidget {
               color: Colors.blueGrey,
             ),
             ), 
-            subtitle: Text('Event ${event.eventname}.'),
+            subtitle: Text('Event ${event.id}.'),
             ),
             )
       );
