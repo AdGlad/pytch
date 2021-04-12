@@ -40,9 +40,9 @@ class _BroadcastState extends State<Broadcast> {
   @override
   void initState() {
     initRenderers();
-    _createPeerConnection().then((pc) {
-      _peerConnection = pc;
-    });
+    // _createPeerConnection().then((pc) {
+    //   _peerConnection = pc;
+    // });
     super.initState();
   }
 
@@ -50,7 +50,12 @@ class _BroadcastState extends State<Broadcast> {
     await _localRenderer.initialize();
     await _remoteRenderer.initialize();
   }
-
+  void _openMedia() async{
+    _createPeerConnection().then((pc) {
+      _peerConnection = pc;
+    });
+  }
+  
   void _createOffer() async {
     // AG
     var uuid = Uuid();
@@ -228,6 +233,16 @@ class _BroadcastState extends State<Broadcast> {
         )
       ]));
 
+  Row openMediaButton() =>
+  Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: <Widget> [
+          new RaisedButton(onPressed: _openMedia,
+                             child: Text('Audio On'), 
+                            color: Colors.amber,
+                             //style: TextButton.styleFrom(primary: Colors.green),
+          )
+  ]
+  );
+
   Row offerAndAnswerButtons() =>
       Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: <Widget>[
         new RaisedButton(
@@ -243,7 +258,7 @@ class _BroadcastState extends State<Broadcast> {
           onPressed: _createOffer,
           child: Text('Broadcast'),
           color: Colors.amber,
-        ),
+          ),
         // RaisedButton(
         //   onPressed: _createAnswer,
         //   child: Text('Answer'),
@@ -290,7 +305,9 @@ class _BroadcastState extends State<Broadcast> {
             ),
           ),
             child: Column(children: [
+          //openMediaButton(),
           videoRenderers(),
+          openMediaButton(),
           offerAndAnswerButtons(),
          // sdpCandidatesTF(),
           //sdpCandidateButtons(),

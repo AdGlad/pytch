@@ -25,10 +25,15 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
+    return Container(
+    child: new FutureBuilder(
       // Initialize FlutterFire
       future: Firebase.initializeApp(),
       builder: (context, snapshot) {
+        if(!snapshot.hasData) {
+         // show loading while waiting for real data
+        return CircularProgressIndicator();
+     }
         // Check for errors
         if (snapshot.hasError) {
           print('SomethingWentWrong()');
@@ -36,6 +41,7 @@ class MyApp extends StatelessWidget {
         }
         // Once complete, show your application
         if (snapshot.connectionState == ConnectionState.done) {
+          
           return StreamProvider<UserLocal>.value(
       value: AuthService().user,
           child: MaterialApp(
@@ -51,6 +57,7 @@ class MyApp extends StatelessWidget {
 
         } //if
         } //builder
-    ); //FutureBuilder
-  } //Widget
+    ) //FutureBuilder
+    );
+    } //Widget
 } //class
