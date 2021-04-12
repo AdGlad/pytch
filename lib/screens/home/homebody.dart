@@ -45,7 +45,7 @@ class Homebody extends StatelessWidget {
               //margin: EdgeInsets.symmetric(vertical: 50.0),
       child: GridView.count(
                     childAspectRatio: 1.2,
-                    //shrinkWrap: true,
+                    shrinkWrap: true,
 
                 // Create a grid with 2 columns. If you change the scrollDirection to
                 // horizontal, this produces 2 rows.
@@ -58,7 +58,7 @@ class Homebody extends StatelessWidget {
                 // Generate 6 widgets that display their index in the List.
                 children: List.generate(3, (index) {
                   return Container( 
-                    margin: EdgeInsets.all(20),
+                    margin: EdgeInsets.all(10.0),
                     //width: 20,
                     //height: 20,
                     child:            FlatButton(
@@ -76,10 +76,10 @@ class Homebody extends StatelessWidget {
                       //label: Text(''),
                       // label: Text('Page $index'),
                       shape: RoundedRectangleBorder(
-                               borderRadius: BorderRadius.all(Radius.circular(20.0))),
+                               borderRadius: BorderRadius.all(Radius.circular(40.0))),
                       color: Colors.lightBlue[50],
                       splashColor: Colors.lightGreen,
-                      padding: EdgeInsets.all(0.0),
+                      padding: EdgeInsets.all(10.0),
                     ),
                   );
                 }),

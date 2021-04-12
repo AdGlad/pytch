@@ -57,8 +57,9 @@ class _BroadcastState extends State<Broadcast> {
     var eventid = uuid.v4();
     // AG
     RTCSessionDescription description =
+       // await _peerConnection.createOffer({'offerToReceiveAudio': 0,'offerToReceiveVideo': 0});
         await _peerConnection.createOffer({'offerToReceiveVideo': 1});
-    var session = parse(description.sdp);
+ var session = parse(description.sdp);
     print(json.encode(session));
     _offer = true;
 
@@ -106,7 +107,10 @@ class _BroadcastState extends State<Broadcast> {
 
   void _createAnswer() async {
     RTCSessionDescription description =
+        //await _peerConnection.createAnswer({'offerToReceiveVideo': 1});
+        //await _peerConnection.createAnswer({'offerToReceiveAudio': 0,'offerToReceiveVideo': 1});
         await _peerConnection.createAnswer({'offerToReceiveVideo': 1});
+
 
     var session = parse(description.sdp);
     print(json.encode(session));
