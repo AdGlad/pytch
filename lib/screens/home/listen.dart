@@ -29,7 +29,7 @@ class _ListenState extends State<Listen> {
   bool _offer = false;
   RTCPeerConnection _peerConnection;
   MediaStream _localStream;
-  RTCVideoRenderer _localRenderer = new RTCVideoRenderer();
+  //RTCVideoRenderer _localRenderer = new RTCVideoRenderer();
   RTCVideoRenderer _remoteRenderer = new RTCVideoRenderer();
   //EventData eventdata;
   final sdpController = TextEditingController();
@@ -37,7 +37,7 @@ class _ListenState extends State<Listen> {
 
   @override
   dispose() {
-    _localRenderer.dispose();
+   // _localRenderer.dispose();
     _remoteRenderer.dispose();
     sdpController.dispose();
     super.dispose();
@@ -58,7 +58,7 @@ class _ListenState extends State<Listen> {
   }
 
   initRenderers() async {
-    await _localRenderer.initialize();
+    //await _localRenderer.initialize();
     await _remoteRenderer.initialize();
 
 
@@ -194,8 +194,8 @@ class _ListenState extends State<Listen> {
     MediaStream stream = await navigator.getUserMedia(mediaConstraints);
 
     // _localStream = stream;
-    _localRenderer.srcObject = stream;
-    _localRenderer.mirror = true;
+    //_localRenderer.srcObject = stream;
+    //_localRenderer.mirror = true;
 
     // _peerConnection.addStream(stream);
 
@@ -205,14 +205,14 @@ class _ListenState extends State<Listen> {
   SizedBox videoRenderers() => SizedBox(
       height: 210,
       child: Row(children: [
-        Flexible(
-          child: new Container(
-            key: new Key("local"),
-            margin: new EdgeInsets.fromLTRB(5.0, 5.0, 5.0, 5.0),
-            decoration: new BoxDecoration(color: Colors.black),
-            child: new RTCVideoView(_localRenderer)
-          ),
-        ),
+        // Flexible(
+        //   child: new Container(
+        //     key: new Key("local"),
+        //     margin: new EdgeInsets.fromLTRB(5.0, 5.0, 5.0, 5.0),
+        //     decoration: new BoxDecoration(color: Colors.black),
+        //     child: new RTCVideoView(_localRenderer)
+        //   ),
+        // ),
         Flexible(
           child: new Container(
               key: new Key("remote"),

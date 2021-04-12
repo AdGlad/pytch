@@ -25,14 +25,14 @@ class _BroadcastState extends State<Broadcast> {
   RTCPeerConnection _peerConnection;
   MediaStream _localStream;
   RTCVideoRenderer _localRenderer = new RTCVideoRenderer();
-  RTCVideoRenderer _remoteRenderer = new RTCVideoRenderer();
+  //RTCVideoRenderer _remoteRenderer = new RTCVideoRenderer();
 
   final sdpController = TextEditingController();
 
   @override
   dispose() {
     _localRenderer.dispose();
-    _remoteRenderer.dispose();
+   // _remoteRenderer.dispose();
     sdpController.dispose();
     super.dispose();
   }
@@ -48,7 +48,7 @@ class _BroadcastState extends State<Broadcast> {
 
   initRenderers() async {
     await _localRenderer.initialize();
-    await _remoteRenderer.initialize();
+    //await _remoteRenderer.initialize();
   }
   void _openMedia() async{
     _createPeerConnection().then((pc) {
@@ -188,7 +188,7 @@ class _BroadcastState extends State<Broadcast> {
 
     pc.onAddStream = (stream) {
       print('addStream: ' + stream.id);
-      _remoteRenderer.srcObject = stream;
+      //_remoteRenderer.srcObject = stream;
     };
 
     return pc;
@@ -224,13 +224,13 @@ class _BroadcastState extends State<Broadcast> {
             child: new RTCVideoView(_localRenderer)
           ),
         ),
-        Flexible(
-          child: new Container(
-              key: new Key("remote"),
-              margin: new EdgeInsets.fromLTRB(5.0, 5.0, 5.0, 5.0),
-              decoration: new BoxDecoration(color: Colors.black),
-              child: new RTCVideoView(_remoteRenderer)),
-        )
+        // Flexible(
+        //   child: new Container(
+        //       key: new Key("remote"),
+        //       margin: new EdgeInsets.fromLTRB(5.0, 5.0, 5.0, 5.0),
+        //       decoration: new BoxDecoration(color: Colors.black),
+        //       child: new RTCVideoView(_remoteRenderer)),
+        // )
       ]));
 
   Row openMediaButton() =>
