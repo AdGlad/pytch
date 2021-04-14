@@ -62,8 +62,8 @@ class _BroadcastState extends State<Broadcast> {
     var eventid = uuid.v4();
     // AG
     RTCSessionDescription description =
-       // await _peerConnection.createOffer({'offerToReceiveAudio': 0,'offerToReceiveVideo': 0});
-        await _peerConnection.createOffer({'offerToReceiveVideo': 1});
+        await _peerConnection.createOffer({'offerToReceiveAudio': 0,'offerToReceiveVideo': 0});
+       // await _peerConnection.createOffer({'offerToReceiveVideo': 1});
  var session = parse(description.sdp);
     print(json.encode(session));
     _offer = true;
@@ -114,7 +114,8 @@ class _BroadcastState extends State<Broadcast> {
     RTCSessionDescription description =
         //await _peerConnection.createAnswer({'offerToReceiveVideo': 1});
         //await _peerConnection.createAnswer({'offerToReceiveAudio': 0,'offerToReceiveVideo': 1});
-        await _peerConnection.createAnswer({'offerToReceiveVideo': 1});
+        await _peerConnection.createAnswer({'offerToReceiveVideo': 0,'offerToReceiveAudio': 0});
+        //await _peerConnection.createAnswer({'offerToReceiveVideo': 0});
 
 
     var session = parse(description.sdp);
@@ -160,7 +161,7 @@ class _BroadcastState extends State<Broadcast> {
 
     final Map<String, dynamic> offerSdpConstraints = {
       "mandatory": {
-        "OfferToReceiveAudio": true,
+        "OfferToReceiveAudio": false,
         "OfferToReceiveVideo": true,
       },
       "optional": [],
@@ -195,11 +196,16 @@ class _BroadcastState extends State<Broadcast> {
   }
 
   _getUserMedia() async {
+
+    // final Map<String, dynamic> mediaConstraints = {
+    //   'audio': true,
+    //   'video': {
+    //     'facingMode': 'user',
+    //   },
     final Map<String, dynamic> mediaConstraints = {
       'audio': false,
-      'video': {
-        'facingMode': 'user',
-      },
+      'video': true,
+
     };
 
     MediaStream stream = await navigator.getUserMedia(mediaConstraints);
