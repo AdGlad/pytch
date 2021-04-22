@@ -1,20 +1,15 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 // import 'package:flutter_webrtc/web/rtc_session_description.dart';
 import 'package:flutter_webrtc/webrtc.dart';
 import 'package:sdp_transform/sdp_transform.dart';
 import 'package:pytch/services/db_event.dart';
 import 'package:provider/provider.dart';
-// AG
 import 'package:uuid/uuid.dart';
-// AG
 
 class Broadcast extends StatefulWidget {
   Broadcast({Key key, this.title}) : super(key: key);
-
   final String title;
-
   @override
   _BroadcastState createState() => _BroadcastState();
 }
@@ -39,7 +34,7 @@ class _BroadcastState extends State<Broadcast> {
 
   @override
   void initState() {
-    initRenderers();
+    //initRenderers();
     // _createPeerConnection().then((pc) {
     //   _peerConnection = pc;
     // });
@@ -50,12 +45,85 @@ class _BroadcastState extends State<Broadcast> {
     await _localRenderer.initialize();
     //await _remoteRenderer.initialize();
   }
-  void _openMedia() async{
-    _createPeerConnection().then((pc) {
-      _peerConnection = pc;
-    });
+
+  _getUserMedia() async {
+
+    // final Map<String, dynamic> mediaConstraints = {
+    //   'audio': true,
+    //   'video': {
+    //     'facingMode': 'user',
+    //   },
+    final Map<String, dynamic> mediaConstraints = {
+      'audio': false,
+      'video': true,
+
+    };
+
+    MediaStream stream = await navigator.getUserMedia(mediaConstraints);
+
+    // _localStream = stream;
+    _localRenderer.srcObject = stream;
+    _localRenderer.mirror = true;
+    _localStream = stream;
+
+    // _peerConnection.addStream(stream);
+
+    return stream;
   }
+  // void _openMedia() async{
+  //   _createPeerConnection().then((pc) {
+  //     _peerConnection = pc;
+  //   });
+  // }
   
+    _createPeerConnection() async {
+    Map<String, dynamic> configuration = {
+      "iceServers": [
+        {"url": "stun:stun.l.google.com:19302"},
+      ]
+    };
+
+    final Map<String, dynamic> offerSdpConstraints = {
+      "mandatory": {
+        "OfferToReceiveAudio": false,
+        "OfferToReceiveVideo": true,
+      },
+      "optional": [],
+    };
+
+    //_localStream = await _getUserMedia();
+
+    RTCPeerConnection pc = await createPeerConnection(configuration, offerSdpConstraints);
+    // if (pc != null) print(pc);
+    //pc.addStream(_localStream);
+
+    pc.onIceCandidate = (e) {
+      if (e.candidate != null) {
+        print(json.encode({
+          'candidate': e.candidate.toString(),
+          'sdpMid': e.sdpMid.toString(),
+          'sdpMlineIndex': e.sdpMlineIndex,
+        }));
+      }
+    };
+
+    pc.onIceConnectionState = (e) {
+      print('onIceConnectionState');
+      print(e);
+    };
+
+    pc.onAddStream = (stream) {
+      print('addStream: ' + stream.id);
+      //_remoteRenderer.srcObject = stream;
+    };
+    _peerConnection = pc;
+    return pc;
+  }
+
+   void _addStream() {
+     _peerConnection.addStream(_localStream);
+   }
+
   void _createOffer() async {
     // AG
     var uuid = Uuid();
@@ -64,7 +132,7 @@ class _BroadcastState extends State<Broadcast> {
     RTCSessionDescription description =
         await _peerConnection.createOffer({'offerToReceiveAudio': 0,'offerToReceiveVideo': 0});
        // await _peerConnection.createOffer({'offerToReceiveVideo': 1});
- var session = parse(description.sdp);
+    var session = parse(description.sdp);
     print(json.encode(session));
     _offer = true;
 
@@ -73,41 +141,63 @@ class _BroadcastState extends State<Broadcast> {
     //       'type': description.type.toString(),
     //     }));
 
-    _peerConnection.setLocalDescription(description);
+    await _peerConnection.setLocalDescription(description);
     // AG
     print(eventid);
-    DbEventService(uid: eventid).createEventData('Manly round 5', '1234');
-    DbEventService(uid: eventid).updateEventoffer(description.type, json.encode(session));
+    await DbEventService(uid: eventid).createEventData('Manly round 5', '1234');
+    await DbEventService(uid: eventid).updateEventoffer(description.type, json.encode(session));
     print('herrrrrrrrrrrrrrrrre');
 
 
-       DbEventService(uid: eventid).eventData.listen((event) {
-        print('event');
-         print(event);
-         print('answer');
-         print(event.answer);
-         print('Value from controller: event');
-         print('candidate');
-         print(event.candidate);
+      //  DbEventService(uid: eventid).eventData.listen((event) async {
+      //   print('event');
+      //    print(event);
+      //    print('answer');
+      //    print(event.answer);
+      //    print('Value from controller: event');
+      //    print('candidate');
+      //    print(event.candidate);
 
-         if (event.answer.isNotEmpty )
-         {
-           sdpController.text = event.answer;
-           _setRemoteDescription();
-         }
+      //    if (event.answer.isNotEmpty )
+      //    {
+      //      sdpController.text = event.answer;
+      //     await _setRemoteDescription();
+      //    }
 
-         if (event.candidate.isNotEmpty )
-         {
-           sdpController.text = event.candidate;
-           _addCandidate();
-         }
-
-         
-         //.toString();
-
-       });
-
+      //    if (event.candidate.isNotEmpty )
+      //    {
+      //      sdpController.text = event.candidate;
+      //     await _addCandidate();
+      //    }
+      //    //.toString();
+      //  });
     // AG
+    // 
+    // 
+    // Put this back VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV
+      // await DbEventService(uid: eventid).eventConnection.listen((event)  async {
+      //    print('eventConnection');
+      //    event.docs.forEach((doc) async {
+      //       print('looping');
+      //       print(doc["connected"]);
+      //       if (doc['answer']['sdp'].isNotEmpty )
+      //         {
+      //          print('Updating answer');
+      //          sdpController.text = doc['answer']['sdp'];
+      //           await _setRemoteDescription();
+      //         }
+
+      //       if (doc['candidate']['sdp'].isNotEmpty )
+      //         {
+      //         print('Updating candidate');
+      //         sdpController.text = doc['candidate']['sdp'];
+      //          await _addCandidate();
+      //         DbEventService(uid: eventid).updateEventconnection('Y');
+      //       }
+      //   });
+      //   });
+    // Put this back NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN
+
   }
 
   void _createAnswer() async {
@@ -152,72 +242,8 @@ class _BroadcastState extends State<Broadcast> {
     await _peerConnection.addCandidate(candidate);
   }
 
-  _createPeerConnection() async {
-    Map<String, dynamic> configuration = {
-      "iceServers": [
-        {"url": "stun:stun.l.google.com:19302"},
-      ]
-    };
 
-    final Map<String, dynamic> offerSdpConstraints = {
-      "mandatory": {
-        "OfferToReceiveAudio": false,
-        "OfferToReceiveVideo": true,
-      },
-      "optional": [],
-    };
 
-    _localStream = await _getUserMedia();
-
-    RTCPeerConnection pc = await createPeerConnection(configuration, offerSdpConstraints);
-    // if (pc != null) print(pc);
-    pc.addStream(_localStream);
-
-    pc.onIceCandidate = (e) {
-      if (e.candidate != null) {
-        print(json.encode({
-          'candidate': e.candidate.toString(),
-          'sdpMid': e.sdpMid.toString(),
-          'sdpMlineIndex': e.sdpMlineIndex,
-        }));
-      }
-    };
-
-    pc.onIceConnectionState = (e) {
-      print(e);
-    };
-
-    pc.onAddStream = (stream) {
-      print('addStream: ' + stream.id);
-      //_remoteRenderer.srcObject = stream;
-    };
-
-    return pc;
-  }
-
-  _getUserMedia() async {
-
-    // final Map<String, dynamic> mediaConstraints = {
-    //   'audio': true,
-    //   'video': {
-    //     'facingMode': 'user',
-    //   },
-    final Map<String, dynamic> mediaConstraints = {
-      'audio': false,
-      'video': true,
-
-    };
-
-    MediaStream stream = await navigator.getUserMedia(mediaConstraints);
-
-    // _localStream = stream;
-    _localRenderer.srcObject = stream;
-    _localRenderer.mirror = true;
-
-    // _peerConnection.addStream(stream);
-
-    return stream;
-  }
 
   SizedBox videoRenderers() => SizedBox(
       height: 210,
@@ -239,9 +265,21 @@ class _BroadcastState extends State<Broadcast> {
         // )
       ]));
 
+  _checkPCState () => print(_peerConnection.iceConnectionState);
+
+  Row connectionState() =>
+  Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: <Widget> [
+          new RaisedButton(onPressed: _checkPCState,
+                             child: Text('Connection State'), 
+                            color: Colors.amber,
+                             //style: TextButton.styleFrom(primary: Colors.green),
+          )
+  ]
+  );
+
   Row openMediaButton() =>
   Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: <Widget> [
-          new RaisedButton(onPressed: _openMedia,
+          new RaisedButton(onPressed: _createPeerConnection(),
                              child: Text('Audio On'), 
                             color: Colors.amber,
                              //style: TextButton.styleFrom(primary: Colors.green),
@@ -275,6 +313,31 @@ class _BroadcastState extends State<Broadcast> {
 
   Row sdpCandidateButtons() =>
       Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: <Widget>[
+          RaisedButton(
+          onPressed: initRenderers,
+          child: Text('Initiate Renders'),
+          color: Colors.amber,
+        ),
+        RaisedButton(
+          onPressed: _getUserMedia,
+          child: Text('Get User Media'),
+          color: Colors.amber,
+        ),
+        RaisedButton(
+          onPressed: _createPeerConnection,
+          child: Text('Create Peer Connection'),
+          color: Colors.amber,
+        ),
+       RaisedButton(
+        onPressed: _addStream,
+          child: Text('Add PC to Stream'),
+          color: Colors.amber,
+        ),
+        RaisedButton(
+          onPressed: _createOffer,
+          child: Text('Create Offer'),
+          color: Colors.amber,
+        ),
         RaisedButton(
           onPressed: _setRemoteDescription,
           child: Text('Set Remote Desc'),
@@ -313,10 +376,11 @@ class _BroadcastState extends State<Broadcast> {
             child: Column(children: [
           //openMediaButton(),
           videoRenderers(),
-          openMediaButton(),
-          offerAndAnswerButtons(),
-         // sdpCandidatesTF(),
-          //sdpCandidateButtons(),
+          //connectionState(),
+          //openMediaButton(),
+          //offerAndAnswerButtons(),
+          sdpCandidatesTF(),
+          sdpCandidateButtons(),
         ])));
   }
 }

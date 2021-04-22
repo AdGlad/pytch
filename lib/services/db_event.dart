@@ -35,6 +35,18 @@ DbEventService({this.uid});
     .then((value) => print("Answer Property updated"))
     .catchError((error) => print("Failed to update answer property: $error"));  
  }
+
+        Future<void> updateEventconnection(
+                               String connected,
+                               ) async {
+
+        print('starting updateEventconnection');
+      return await 
+      eventCollection..doc(uid).update({'connected':  connected})
+    .then((value) => print("Connected Property updated"))
+    .catchError((error) => print("Failed to update Connected property: $error"));  
+ }
+
         Future<void> updateEventcandidate(
                                String candidatetype,
                                String candidatesdp,
@@ -45,6 +57,8 @@ DbEventService({this.uid});
     .then((value) => print("candidate Property updated"))
     .catchError((error) => print("Failed to update candidate: $error"));
        }
+
+
         Future<void> createEventData(
                                String eventname,
                                String userid,
@@ -57,6 +71,7 @@ DbEventService({this.uid});
         'offer': {'type': '','sdp': ''} ,
         'answer': {'type': '','sdp': ''} ,
         'candidate': {'type': '','sdp': ''} , 
+        'connected': 'N' , 
     })
     .then((value) => print("Event Property created"))
     .catchError((error) => print("Failed to delete user's property: $error"));
@@ -104,6 +119,7 @@ EventData _eventDataFromSnapshot(DocumentSnapshot snapshot) {
     answer: snapshot.data()['answer']['sdp']  ?? '',
    // answer: snapshot.data()['answer'][0]['sdp']  ?? '',
     candidate: snapshot.data()['candidate']['sdp']  ?? '',
+    connected: snapshot.data()['connected']  ?? '',
     );
 }
 
@@ -111,9 +127,14 @@ EventData _eventDataFromSnapshot(DocumentSnapshot snapshot) {
     return eventCollection.doc(uid).snapshots().map(_eventDataFromSnapshot);
   }
 
- // Stream<EventData> get answerswebrtc {
- //   return eventCollection.doc(uid).snapshots().map(_eventDataFromSnapshot);
- // }
+   Stream<QuerySnapshot> get eventConnection { 
+    //return eventCollection.doc(uid).snapshots().map(_eventDataFromSnapshot);
+
+    return eventCollection.where(FieldPath.documentId,isEqualTo: uid).where('connected',isEqualTo: 'N').snapshots();
+  }
+ Stream<EventData> get answerswebrtc {
+   return eventCollection.doc(uid).snapshots().map(_eventDataFromSnapshot);
+ }
 
 }   
 

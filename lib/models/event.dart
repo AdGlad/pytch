@@ -31,11 +31,13 @@ class EventData {
   final String offer;
   final String answer;
   final String candidate;
+  final String connected;
+
   //List<Answer> answers;
 
 
   //EventData({this.id,this.eventname,this.offer,this.answer,this.candidate,this.answers});
-  EventData({this.id,this.eventname,this.offer,this.answer,this.candidate});
+  EventData({this.id,this.eventname,this.offer,this.answer,this.candidate,this.connected});
 
   factory EventData.fromJson(dynamic json) {
     if (json['answers'] != null) {
@@ -46,6 +48,7 @@ class EventData {
                  offer: json['offer'] as String,
                  answer: json['answer'] as String,
                  candidate: json['candidate'] as String,
+                 connected: json['connected'] as String,
                  //answers: _answers
                  );
     } else {
@@ -53,13 +56,14 @@ class EventData {
                  eventname: json['eventname'] as String,
                  offer: json['offer'] as String,
                  answer: json['answer'] as String,
-                 candidate: json['candidate'] as String);
-    }
+                 candidate: json['candidate'] as String,
+                 connected: json['connected'] as String);   
+                }
   }
 
   @override
   String toString() {
-    return '{ ${this.id}, ${this.eventname},${this.offer}, ${this.answer}, ${this.candidate} }';
+    return '{ ${this.id}, ${this.eventname},${this.offer}, ${this.answer}, ${this.candidate}, ${this.connected} }';
     //,${this.answers} 
    
   }

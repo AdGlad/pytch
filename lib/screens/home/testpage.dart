@@ -6,6 +6,14 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:pytch/models/eventanswer.dart';
 import 'package:pytch/services/db_event.dart';
 
+
+
+
+
+
+
+
+
 Future<void> addfirestore(var ref) {
       // Call the user's CollectionReference to add a new user
       //var ref = FirebaseFirestore.instance.collection("data_collection");
@@ -95,6 +103,42 @@ Future<void> QueryCollections(var refl) {
     // 
 }
 
+Future<void> QueryEvents(var refl) {
+    //String uid = '3373f0ae-d20c-4d24-81e2-501cb8b59aa9';
+    String uid = '751250a4-54a5-46cf-99ac-79c22be1aa4a';
+
+    Query eventCollection = FirebaseFirestore.instance.collection('events');
+    //eventCollection.where(FieldPath.documentId,isEqualTo: uid).where('connection',isEqualTo: 'N').snapshots().map(_eventdataListFromSnapshot);
+    print(eventCollection.toString());
+    print('ggggggggggggggggggggggggggggggg');
+    //eventCollection.where(FieldPath.documentId,isEqualTo: uid)
+    //eventCollection.where('sdpapp',isEqualTo: 'N')
+    //eventCollection.where('userid',isEqualTo: '1234')
+    eventCollection.where('connection',isEqualTo: 'N')
+    .where(FieldPath.documentId,isEqualTo: uid)
+                   // .where('sdpapp',isEqualTo: 'N')
+                   // .where('connection',isEqualTo: 'N')
+                   .get().then((QuerySnapshot querySnapshot) {
+         querySnapshot.docs.forEach((doc) {
+            print('in loooooop');
+            print(doc.data()['answer']['sdpapp']);
+            print(doc.data()['answer']['type']);
+            //print(doc['data']['adam']);
+    });});
+    // print('ddddddddd');
+
+    // print(userCollection.toString());
+    // userCollection.get().then((querySnapshot)  {
+    //       querySnapshot.docs.forEach(
+    //         (document) {
+    //         //print(document['age']);
+    //         print(document);
+    //       }
+    //       );
+    // });
+    // 
+}
+
 // Future<void> removeFieldOld(var ref) {
 //        // var ref = FirebaseFirestore.instance.collection("data_collection");
 
@@ -143,16 +187,30 @@ class _TestPageState extends State<TestPage> {
    @override
    void initState() {
   
-     String eventid = '58be842f-65d6-46c6-bd32-35ba1d5a6f4b';
+     //String eventid = '58be842f-65d6-46c6-bd32-35ba1d5a6f4b';
+     String eventid = '751250a4-54a5-46cf-99ac-79c22be1aa4a';
 
-       DbEventService(uid: eventid).eventData.listen((event) {
-        print('event');
+    //  QuerySnapshot querySnapshot;
+    //    DbEventService(uid: eventid).eventData.listen((event) {
+    //     print('event');
+    //      print(event);
+    //      print('answer');
+    //      //print(event.answer);
+    //      print('Value from controller: event');
+    //    });
+      DbEventService(uid: eventid).eventConnection.listen((event) {
+        print('eventConnection');
          print(event);
          print('answer');
          //print(event.answer);
-         print('Value from controller: event');
+         print('Value from eventConnection: event');
+         event.docs.forEach((doc) {
+            print('looping');
+            print(doc["connection"]);
+        });
+
        });
-  //    //   print('Value from controller: $value');
+
   // 
      super.initState();
    }
@@ -188,6 +246,12 @@ Widget build(BuildContext context) {
                  child: Text('QueryCollection'),
                      onPressed: () {
                         QueryCollections(ref);
+                      },
+             ),
+             TextButton(
+                 child: Text('QueryEvents'),
+                     onPressed: () {
+                        QueryEvents(ref);
                       },
              ),
             //   TextButton(

@@ -46,14 +46,14 @@ class _ListenState extends State<Listen> {
   @override
   void initState() {
     initRenderers();
-    _createPeerConnection().then((pc) {
-      _peerConnection = pc;
-    // AG
-    sdpController.text = widget.event.offer;
-    _setRemoteDescription();
-    _createAnswer();
-    // AG
-    });
+    // _createPeerConnection().then((pc) {
+    //   _peerConnection = pc;
+    // // AG
+    // sdpController.text = widget.event.offer;
+    // //_setRemoteDescription();
+    // //_createAnswer();
+    // // AG
+    // });
     super.initState();
   }
 
@@ -67,6 +67,7 @@ class _ListenState extends State<Listen> {
   }
 
   void _createOffer() async {
+    print('_createOffer');
     // AG
     var uuid = Uuid();
     var eventid = uuid.v4();
@@ -74,7 +75,7 @@ class _ListenState extends State<Listen> {
     RTCSessionDescription description =
         await _peerConnection.createOffer({'offerToReceiveVideo': 1});
     var session = parse(description.sdp);
-    print(json.encode(session));
+    //print(json.encode(session));
     _offer = true;
 
     // print(json.encode({
@@ -90,7 +91,20 @@ class _ListenState extends State<Listen> {
   }
 
   void _createAnswer() async {
-    RTCSessionDescription description =
+
+       await _createPeerConnection().then((pc) {
+      _peerConnection = pc;
+    // AG
+    sdpController.text = widget.event.offer;
+    //_setRemoteDescription();
+    //_createAnswer();
+    // AG
+    });
+
+
+    print('_createAnswer');
+        await _setRemoteDescription();
+        RTCSessionDescription description =
         await _peerConnection.createAnswer({'offerToReceiveVideo': 1});
 
     var session = parse(description.sdp);
@@ -112,6 +126,7 @@ class _ListenState extends State<Listen> {
 
 
   void _setRemoteDescription() async {
+    print('_setRemoteDescription');
     String jsonString = sdpController.text;
     dynamic session = await jsonDecode('$jsonString');
 
@@ -121,15 +136,16 @@ class _ListenState extends State<Listen> {
     //     new RTCSessionDescription(session['sdp'], session['type']);
     RTCSessionDescription description =
         new RTCSessionDescription(sdp, _offer ? 'answer' : 'offer');
-    print(description.toMap());
+    //print(description.toMap());
 
     await _peerConnection.setRemoteDescription(description);
   }
 
   void _addCandidate() async {
+    print('_addCandidate');
     String jsonString = sdpController.text;
     dynamic session = await jsonDecode('$jsonString');
-    print(session['candidate']);
+    //print(session['candidate']);
     dynamic candidate =
         new RTCIceCandidate(session['candidate'], session['sdpMid'], session['sdpMlineIndex']);
     await _peerConnection.addCandidate(candidate);
@@ -155,11 +171,23 @@ class _ListenState extends State<Listen> {
     RTCPeerConnection pc = await createPeerConnection(configuration, offerSdpConstraints);
     // if (pc != null) print(pc);
     pc.addStream(_localStream);
-
+    
     bool _firstCandidate = true;
+      print(' before onIceCandidate loop ');
+
+    pc.onIceCandidate = (e) {
+      print('pc.onIceCandidate loop');
+      if (e.candidate != null) {
+        print(json.encode({
+          'candidate': e.candidate.toString(),
+          'sdpMid': e.sdpMid.toString(),
+          'sdpMlineIndex': e.sdpMlineIndex,
+        }));
+      }
+    };
 
       pc.onIceCandidate = (e) {
-
+      print(' do onIceCandidate loop ');
         if (_firstCandidate) {
           _firstCandidate = false;
                 DbEventService(uid: widget.event.id).updateEventcandidate('candidate',
@@ -171,7 +199,10 @@ class _ListenState extends State<Listen> {
                 );        }
            };
 
+
+
     pc.onIceConnectionState = (e) {
+      print('onIceConnectionState');
       print(e);
     };
 
@@ -240,7 +271,7 @@ class _ListenState extends State<Listen> {
         // ),
         RaisedButton(
           onPressed: _createAnswer,
-          child: Text('Listen'),
+          child: Text('Listen Now'),
           color: Colors.amber,
         ),
       ]);
