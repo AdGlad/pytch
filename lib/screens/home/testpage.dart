@@ -7,13 +7,6 @@ import 'package:pytch/models/eventanswer.dart';
 import 'package:pytch/services/db_event.dart';
 
 
-
-
-
-
-
-
-
 Future<void> addfirestore(var ref) {
       // Call the user's CollectionReference to add a new user
       //var ref = FirebaseFirestore.instance.collection("data_collection");
@@ -88,7 +81,8 @@ Future<void> QueryCollections(var refl) {
             print('in loooooop');
             print(doc.data());
             //print(doc['data']['adam']);
-    });});
+    });
+    });
     // print('ddddddddd');
 
     // print(userCollection.toString());
@@ -102,6 +96,50 @@ Future<void> QueryCollections(var refl) {
     // });
     // 
 }
+
+Future<void> SubCollection(var ref) {
+      return ref
+          .doc("h5BKsA58r7ozoVKF3lV7").collection("subCollection").doc("message1").set({"password": "password"})
+          .then((value) => print("User Added"))
+          .catchError((error) => print("Failed to add user: $error"));
+    }
+
+Future<void> QuerySubCollections(var refl) {
+     //final CollectionReference userCollection = FirebaseFirestore.instance.collection('users');
+    //var ref = FirebaseFirestore.instance.collection("data_collection");
+
+    //Query ref = FirebaseFirestore.instance.collection('data_collection').doc("h5BKsA58r7ozoVKF3lV7").collection("subCollection").doc("message1");
+    Query ref = FirebaseFirestore.instance.collection('data_collection').doc("h5BKsA58r7ozoVKF3lV7").collection("subCollection").where("password", isEqualTo: "password");
+    print(ref.toString());
+    print('ggggggggggggggggggggggggggggggg');
+    ref.get().then((QuerySnapshot querySnapshot) {
+         querySnapshot.docs.forEach((doc) {
+            print('in QuerySubCollections loooooop');
+            print(doc.data());
+            //print(doc['data']['adam']);
+          });
+          });
+
+}
+
+Future<void> QuerySubCollectionDoc(var refl) async {
+     //final CollectionReference userCollection = FirebaseFirestore.instance.collection('users');
+    //var ref = FirebaseFirestore.instance.collection("data_collection");
+
+    //Query ref = FirebaseFirestore.instance.collection('data_collection').doc("h5BKsA58r7ozoVKF3lV7").collection("subCollection").doc("message1");
+    DocumentSnapshot ref = await  FirebaseFirestore.instance.collection('data_collection').doc("h5BKsA58r7ozoVKF3lV7").collection("subCollection").doc("message1").get();
+    print(ref.data()['password']);
+    print('ggggggggggggggggggggggggggggggg');
+    // ref.get().then((QuerySnapshot querySnapshot) {
+    //      querySnapshot.docs.forEach((doc) {
+    //         print('in QuerySubCollections loooooop');
+    //         print(doc.data());
+    //         //print(doc['data']['adam']);
+    //       });
+    //       });
+
+}
+
 
 Future<void> QueryEvents(var refl) {
     //String uid = '3373f0ae-d20c-4d24-81e2-501cb8b59aa9';
@@ -254,6 +292,26 @@ Widget build(BuildContext context) {
                         QueryEvents(ref);
                       },
              ),
+              TextButton(
+                 child: Text(' Create SubCollection'),
+                     onPressed: () {
+                        SubCollection(ref);
+                      },
+             ),
+              TextButton(
+                 child: Text('QuerySubCollections'),
+                     onPressed: () {
+                        QuerySubCollections(ref);
+                      },
+             ),
+             TextButton(
+                 child: Text('QuerySubCollectionDoc'),
+                     onPressed: () {
+                        QuerySubCollectionDoc(ref);
+                      },
+             ),
+
+             
             //   TextButton(
             //      child: Text('removeFieldOld'),
             //          onPressed: () {
