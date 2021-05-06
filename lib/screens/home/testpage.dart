@@ -5,6 +5,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:pytch/models/eventanswer.dart';
 import 'package:pytch/services/db_event.dart';
+import 'package:uuid/uuid.dart';
+
 
 
 Future<void> addfirestore(var ref) {
@@ -99,16 +101,33 @@ Future<void> QueryCollections(var refl) {
 
 Future<void> SubCollection(var ref) {
       return ref
-          .doc("h5BKsA58r7ozoVKF3lV7").collection("subCollection").doc("message1").set({"password": "password"})
+          .doc("h5BKsA58r7ozoVKF3lV7").collection("subCollection").doc("message2").set({"password": "password"})
           .then((value) => print("User Added"))
           .catchError((error) => print("Failed to add user: $error"));
+    }
+
+Future<void> createPC (var eventid) async {
+      String pcid ;
+      var uuid = Uuid();
+      pcid = uuid.v4();
+      var _collectionReference = FirebaseFirestore.instance.collection('Event');
+
+       return _collectionReference
+          .doc(eventid).collection("PeerCollection").doc(pcid).set({
+            'offer': {'type': '','sdp': ''} ,
+            'answer': {'type': '','sdp': ''} ,
+            'candidate': {'type': '','sdp': ''} , 
+            'connected': 'N' ,})
+          .then((value) => print("PeerCollection Added"))
+          .catchError((error) => print("Failed to add PeerCollection: $error"));
+
     }
 
 Future<void> QuerySubCollections(var refl) {
      //final CollectionReference userCollection = FirebaseFirestore.instance.collection('users');
     //var ref = FirebaseFirestore.instance.collection("data_collection");
 
-    //Query ref = FirebaseFirestore.instance.collection('data_collection').doc("h5BKsA58r7ozoVKF3lV7").collection("subCollection").doc("message1");
+    //Query ref = FirebaseFirestore.instance.collection('data_collection').doc("h5BKsA58r7ozoVKF3lV7").collection("subCollection").doc("message8");
     Query ref = FirebaseFirestore.instance.collection('data_collection').doc("h5BKsA58r7ozoVKF3lV7").collection("subCollection").where("password", isEqualTo: "password");
     print(ref.toString());
     print('ggggggggggggggggggggggggggggggg');
@@ -126,8 +145,8 @@ Future<void> QuerySubCollectionDoc(var refl) async {
      //final CollectionReference userCollection = FirebaseFirestore.instance.collection('users');
     //var ref = FirebaseFirestore.instance.collection("data_collection");
 
-    //Query ref = FirebaseFirestore.instance.collection('data_collection').doc("h5BKsA58r7ozoVKF3lV7").collection("subCollection").doc("message1");
-    DocumentSnapshot ref = await  FirebaseFirestore.instance.collection('data_collection').doc("h5BKsA58r7ozoVKF3lV7").collection("subCollection").doc("message1").get();
+    //Query ref = FirebaseFirestore.instance.collection('data_collection').doc("h5BKsA58r7ozoVKF3lV7").collection("subCollection").doc("message5");
+    DocumentSnapshot ref = await  FirebaseFirestore.instance.collection('data_collection').doc("h5BKsA58r7ozoVKF3lV7").collection("subCollection").doc("message3").get();
     print(ref.data()['password']);
     print('ggggggggggggggggggggggggggggggg');
     // ref.get().then((QuerySnapshot querySnapshot) {
@@ -225,6 +244,60 @@ class _TestPageState extends State<TestPage> {
    @override
    void initState() {
   
+  // FirebaseFirestore.instance.collection('events').where(FieldPath.documentId,isEqualTo: 'eventid').where('connected',isEqualTo: 'N').snapshots().listen((event) {
+  // Listen for Broadcaster event subscriptions
+  //  FirebaseFirestore.instance.collection('events').where(FieldPath.documentId,isEqualTo: 'eventid').snapshots().listen((event) {
+  //    print('Test Event for eventid updated');
+  //  });
+
+   FirebaseFirestore.instance.collection('events').where('userid',isEqualTo: '1234').snapshots().listen((event) {
+     print('Event subscriptions for user 123456');
+   });
+  // FirebaseFirestore.instance.collection('events').doc('eventid').collection('subCollection').doc('message6').snapshots().listen((event) { 
+  //   print('New peer connection for user 1234');
+  // });
+
+    FirebaseFirestore.instance.collection('events').doc('eventid').collection('subCollection').where('offerCreated',isEqualTo: 'N').snapshots().listen((event) {
+        print('New peer connection for event eventid');
+        print('create Offer');
+
+    });
+
+    FirebaseFirestore.instance.collection('events').doc('eventid').collection('subCollection').doc('message6').snapshots().listen((event) {
+        print('Monitor peer connection for connection updates');
+
+        //print(event.toString());
+        //print(event.data().toString());
+         print(event['connected']);
+         print(event.data()['offerCreated']);
+         print(event.data()['answerCreated']);
+         print(event.data()['candidatesCreated']);
+         print(event.data()['remoteDescAssigned']);
+         print(event.data()['candidateAssigned']);
+
+         if (event.data()['offerCreated']=='Y') {
+             print('offerCreated');
+             print('Create Answer');
+             
+         }
+    });
+
+  // FirebaseFirestore.instance.collection('subCollection').where('eventname',isEqualTo: 'eventid').snapshots().listen((event) 
+  // { 
+  //  print('New peer connection for user 1234');
+  // });
+
+// FirebaseFirestore.instance.collection('events')doc('eventid').collection('subCollection').doc('message6').snapshots().listen((event) { 
+//   print('New peer connection for user 1234');
+// });
+
+
+  //  FirebaseFirestore.instance.collection('events').where('userid',isEqualTo: '1234').collection('subCollection').snapshots().listen((event) {
+  //    print('Event subscriptions for user 1234');
+  //  });
+
+
+
      //String eventid = '58be842f-65d6-46c6-bd32-35ba1d5a6f4b';
      String eventid = '751250a4-54a5-46cf-99ac-79c22be1aa4a';
 
@@ -236,22 +309,98 @@ class _TestPageState extends State<TestPage> {
     //      //print(event.answer);
     //      print('Value from controller: event');
     //    });
-      DbEventService(uid: eventid).eventConnection.listen((event) {
-        print('eventConnection');
-         print(event);
-         print('answer');
-         //print(event.answer);
-         print('Value from eventConnection: event');
-         event.docs.forEach((doc) {
-            print('looping');
-            print(doc["connection"]);
-        });
+      // DbEventService(uid: eventid).eventConnection.listen((event) {
+      //   print('eventConnection');
+      //    print(event);
+      //    print('answer');
+      //    //print(event.answer);
+      //    print('Value from eventConnection: event');
+      //    event.docs.forEach((doc) {
+      //       print('looping');
+      //       print(doc["connection"]);
+      //   });
 
-       });
+      //  });
 
   // 
      super.initState();
    }
+
+
+   deleteEvent () async
+   {
+  print('deleteEvent');
+        //await FirebaseFirestore.instance.collection('events').doc('eventid').collection('subCollection').doc('message8').delete();
+        await FirebaseFirestore.instance.collection('events').doc('eventid').delete();
+        //await FirebaseFirestore.instance.collection('subCollection').doc('message9').delete();
+
+}
+   deletePeerConnection () async
+   {
+  print('deletePeerConnection');
+        await FirebaseFirestore.instance.collection('events').doc('eventid').collection('subCollection').doc('message6').delete();
+        //await FirebaseFirestore.instance.collection('events').doc('eventid').delete();
+        //await FirebaseFirestore.instance.collection('subCollection').doc('message6').delete();
+
+}
+
+createEvent () async
+{
+  print('createEvent');
+      await DbEventService(uid: 'eventid').createEventData('Manly round 5', '1234');
+
+}
+
+createPeerConnection () async
+{
+    print('createPeerConnection: Create Peer Connection for event id');
+          await FirebaseFirestore.instance.collection('events').doc('eventid').collection("subCollection").doc("message6").
+          set({
+          'eventname': 'eventid',
+          //'userid': userid,
+          'offer': {'type': '', 'sdp': ''},
+          'answer': {'type': '', 'sdp': ''},
+          'candidate': {'type': '', 'sdp': ''},
+          'connected': 'N',
+          'offerCreated': 'N',
+          'answerCreated': 'N',
+          'candidatesCreated': 'N',
+          'remoteDescAssigned': 'N',
+          'candidateAssigned': 'N',
+        })
+           .then((value) => print("User Added"))
+           .catchError((error) => print("Failed to add user: $error"));
+
+}
+createOffer () async
+{
+    print('createOffer');
+          await FirebaseFirestore.instance.collection('events').doc('eventid').collection("subCollection").doc("message6").update({'offerCreated': 'Y'});
+}
+createAnswer () async
+{
+    print('createAnswer');
+    await FirebaseFirestore.instance.collection('events').doc('eventid').collection("subCollection").doc("message6").update({'answerCreated': 'Y'});
+
+}
+createCandidate () async
+{
+    print('createCandidate');
+    await FirebaseFirestore.instance.collection('events').doc('eventid').collection("subCollection").doc("message6").update({'candidatesCreated': 'Y'});
+
+}
+createRemoteDescription () async
+{
+    print('createRemoteDescription');
+    await FirebaseFirestore.instance.collection('events').doc('eventid').collection("subCollection").doc("message6").update({'remoteDescAssigned': 'Y'});
+
+}
+updateCandidate () async
+{
+    print('updateCandidate');
+    await FirebaseFirestore.instance.collection('events').doc('eventid').collection("subCollection").doc("message6").update({'candidateAssigned': 'Y'});
+
+}
 
   @override
 Widget build(BuildContext context) {
@@ -263,54 +412,107 @@ Widget build(BuildContext context) {
         body: Container(
           child: Column(children: [
              TextButton(
-                 child: Text('deleteField'),
+                 child: Text('deleteEvent'),
                      onPressed: () {
-                        deleteField(ref);
+                        deleteEvent();
+                      },
+             ),
+              TextButton(
+                 child: Text('deletePeerConnection'),
+                     onPressed: () {
+                        deletePeerConnection();
+                      },
+             ),            TextButton(
+                 child: Text('createEvent'),
+                     onPressed: () {
+                        createEvent();
                       },
              ),
              TextButton(
-                 child: Text('updateField'),
+                 child: Text('Create Peer Connection listenEvent'),
                      onPressed: () {
-                        updateField(ref);
-                      },
-             ),
-              TextButton(
-                 child: Text('removeField'),
-                     onPressed: () {
-                        removeField(ref);
-                      },
-             ),
-              TextButton(
-                 child: Text('QueryCollection'),
-                     onPressed: () {
-                        QueryCollections(ref);
+                        createPeerConnection();
                       },
              ),
              TextButton(
-                 child: Text('QueryEvents'),
+                 child: Text('createOffer'),
                      onPressed: () {
-                        QueryEvents(ref);
-                      },
-             ),
-              TextButton(
-                 child: Text(' Create SubCollection'),
-                     onPressed: () {
-                        SubCollection(ref);
-                      },
-             ),
-              TextButton(
-                 child: Text('QuerySubCollections'),
-                     onPressed: () {
-                        QuerySubCollections(ref);
+                        createOffer();
                       },
              ),
              TextButton(
-                 child: Text('QuerySubCollectionDoc'),
+                 child: Text('createAnswer'),
                      onPressed: () {
-                        QuerySubCollectionDoc(ref);
+                        createAnswer();
                       },
              ),
-
+             TextButton(
+                 child: Text('createCandidate'),
+                     onPressed: () {
+                        createCandidate();
+                      },
+             ), 
+              TextButton(
+                 child: Text('createRemoteDescription'),
+                     onPressed: () {
+                        createRemoteDescription();
+                      },
+             ), 
+              TextButton(
+                 child: Text('updateCandidate'),
+                     onPressed: () {
+                        updateCandidate();
+                      },
+             ),                        
+            //  TextButton(
+            //      child: Text('updateField'),
+            //          onPressed: () {
+            //             updateField(ref);
+            //           },
+            //  ),
+            //   TextButton(
+            //      child: Text('removeField'),
+            //          onPressed: () {
+            //             removeField(ref);
+            //           },
+            //  ),
+            //   TextButton(
+            //      child: Text('QueryCollection'),
+            //          onPressed: () {
+            //             QueryCollections(ref);
+            //           },
+            //  ),
+            //  TextButton(
+            //      child: Text('QueryEvents'),
+            //          onPressed: () {
+            //             QueryEvents(ref);
+            //           },
+            //  ),
+            //   TextButton(
+            //      child: Text(' Create SubCollection'),
+            //          onPressed: () {
+            //             SubCollection(ref);
+            //           },
+            //  ),
+            //   TextButton(
+            //      child: Text('QuerySubCollections'),
+            //          onPressed: () {
+            //             QuerySubCollections(ref);
+            //           },
+            //  ),
+            //  TextButton(
+            //      child: Text('QuerySubCollectionDoc'),
+            //          onPressed: () {
+            //             QuerySubCollectionDoc(ref);
+            //           },
+            //  ),
+            //  TextButton(
+            //      child: Text('createPC record'),
+            //          onPressed: () {
+            //             createPC('ref');
+            //           },
+            //  ),
+             
              
             //   TextButton(
             //      child: Text('removeFieldOld'),

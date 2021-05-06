@@ -15,19 +15,17 @@ class Broadcast extends StatefulWidget {
 }
 
 class _BroadcastState extends State<Broadcast> {
+  var eventid ;
 
   bool _offer = false;
   RTCPeerConnection _peerConnection;
-  MediaStream _localStream;
-  RTCVideoRenderer _localRenderer = new RTCVideoRenderer();
-  //RTCVideoRenderer _remoteRenderer = new RTCVideoRenderer();
-
+  MediaStream _stream;
+  RTCVideoRenderer _renderer = new RTCVideoRenderer();
   final sdpController = TextEditingController();
 
   @override
   dispose() {
-    _localRenderer.dispose();
-   // _remoteRenderer.dispose();
+    _renderer.dispose();
     sdpController.dispose();
     super.dispose();
   }
@@ -42,7 +40,7 @@ class _BroadcastState extends State<Broadcast> {
   }
 
   initRenderers() async {
-    await _localRenderer.initialize();
+    await _renderer.initialize();
     //await _remoteRenderer.initialize();
   }
 
@@ -61,10 +59,10 @@ class _BroadcastState extends State<Broadcast> {
 
     MediaStream stream = await navigator.getUserMedia(mediaConstraints);
 
-    // _localStream = stream;
-    _localRenderer.srcObject = stream;
-    _localRenderer.mirror = true;
-    _localStream = stream;
+    // _stream = stream;
+    _renderer.srcObject = stream;
+    _renderer.mirror = true;
+    _stream = stream;
 
     // _peerConnection.addStream(stream);
 
@@ -91,11 +89,11 @@ class _BroadcastState extends State<Broadcast> {
       "optional": [],
     };
 
-    //_localStream = await _getUserMedia();
+    //_stream = await _getUserMedia();
 
     RTCPeerConnection pc = await createPeerConnection(configuration, offerSdpConstraints);
     // if (pc != null) print(pc);
-    //pc.addStream(_localStream);
+    //pc.addStream(_stream);
 
     pc.onIceCandidate = (e) {
       if (e.candidate != null) {
@@ -121,13 +119,18 @@ class _BroadcastState extends State<Broadcast> {
   }
 
    void _addStream() {
-     _peerConnection.addStream(_localStream);
+     _peerConnection.addStream(_stream);
    }
+void _createEvent() async {
+    var uuid = Uuid();
+    eventid = uuid.v4();
+      await DbEventService(uid: eventid).createEventData('Manly round 5', '1234');
 
+}
   void _createOffer() async {
     // AG
-    var uuid = Uuid();
-    var eventid = uuid.v4();
+   // var uuid = Uuid();
+   // var eventid = uuid.v4();
     // AG
     RTCSessionDescription description =
         await _peerConnection.createOffer({'offerToReceiveAudio': 0,'offerToReceiveVideo': 0});
@@ -143,8 +146,8 @@ class _BroadcastState extends State<Broadcast> {
 
     await _peerConnection.setLocalDescription(description);
     // AG
-    print(eventid);
-    await DbEventService(uid: eventid).createEventData('Manly round 5', '1234');
+    //print(eventid);
+    //await DbEventService(uid: eventid).createEventData('Manly round 5', '1234');
     await DbEventService(uid: eventid).updateEventoffer(description.type, json.encode(session));
     print('herrrrrrrrrrrrrrrrre');
 
@@ -200,25 +203,7 @@ class _BroadcastState extends State<Broadcast> {
 
   }
 
-  void _createAnswer() async {
-    RTCSessionDescription description =
-        //await _peerConnection.createAnswer({'offerToReceiveVideo': 1});
-        //await _peerConnection.createAnswer({'offerToReceiveAudio': 0,'offerToReceiveVideo': 1});
-        await _peerConnection.createAnswer({'offerToReceiveVideo': 0,'offerToReceiveAudio': 0});
-        //await _peerConnection.createAnswer({'offerToReceiveVideo': 0});
-
-
-    var session = parse(description.sdp);
-    print(json.encode(session));
-    // print(json.encode({
-    //       'sdp': description.sdp.toString(),
-    //       'type': description.type.toString(),
-    //     }));
-
-    _peerConnection.setLocalDescription(description);
-  }
-
-  void _setRemoteDescription() async {
+   void _setRemoteDescription() async {
     String jsonString = sdpController.text;
     dynamic session = await jsonDecode('$jsonString');
 
@@ -253,7 +238,7 @@ class _BroadcastState extends State<Broadcast> {
             key: new Key("local"),
             margin: new EdgeInsets.fromLTRB(5.0, 5.0, 5.0, 5.0),
             decoration: new BoxDecoration(color: Colors.black),
-            child: new RTCVideoView(_localRenderer)
+            child: new RTCVideoView(_renderer)
           ),
         ),
         // Flexible(
@@ -320,6 +305,11 @@ class _BroadcastState extends State<Broadcast> {
         ),
         RaisedButton(
           onPressed: _getUserMedia,
+          child: Text('Get User Media'),
+          color: Colors.amber,
+        ),
+        RaisedButton(
+          onPressed: _createEvent,
           child: Text('Get User Media'),
           color: Colors.amber,
         ),

@@ -23,29 +23,22 @@ class Listen extends StatefulWidget {
 }
 
 class _ListenState extends State<Listen> {
-
-
-
   bool _offer = false;
   RTCPeerConnection _peerConnection;
-  MediaStream _localStream;
-  //RTCVideoRenderer _localRenderer = new RTCVideoRenderer();
-  RTCVideoRenderer _remoteRenderer = new RTCVideoRenderer();
-  //EventData eventdata;
+  MediaStream _stream;
+  RTCVideoRenderer _renderer = new RTCVideoRenderer();
   final sdpController = TextEditingController();
-  String _candidates;
 
   @override
   dispose() {
-   // _localRenderer.dispose();
-    _remoteRenderer.dispose();
+    _renderer.dispose();
     sdpController.dispose();
     super.dispose();
   }
 
   @override
   void initState() {
-    initRenderers();
+  //  initRenderers();
     // _createPeerConnection().then((pc) {
     //   _peerConnection = pc;
     // // AG
@@ -59,52 +52,108 @@ class _ListenState extends State<Listen> {
 
   initRenderers() async {
     //await _localRenderer.initialize();
-    await _remoteRenderer.initialize();
-
-
-
-
+    await _renderer.initialize();
   }
 
-  void _createOffer() async {
-    print('_createOffer');
-    // AG
-    var uuid = Uuid();
-    var eventid = uuid.v4();
-    // AG
-    RTCSessionDescription description =
-        await _peerConnection.createOffer({'offerToReceiveVideo': 1});
-    var session = parse(description.sdp);
-    //print(json.encode(session));
-    _offer = true;
+  _getUserMedia() async {
+    final Map<String, dynamic> mediaConstraints = {
+      'audio': false,
+      'video': {
+        'facingMode': 'user',
+      },
+  };
 
-    // print(json.encode({
-    //       'sdp': description.sdp.toString(),
-    //       'type': description.type.toString(),
-    //     }));
+    MediaStream stream = await navigator.getUserMedia(mediaConstraints);
 
-    _peerConnection.setLocalDescription(description);
-    // AG
-    // DbEventService(uid: eventid).createEventData('Manly round 3', '1234');
-    // DbEventService(uid: eventid).updateEventoffer(description.type, json.encode(session));
-    // AG
+     _stream = stream;
+    //_localRenderer.srcObject = stream;
+    //_localRenderer.mirror = true;
+
+    // _peerConnection.addStream(stream);
+    return stream;
   }
 
-  void _createAnswer() async {
+    _createPeerConnection() async {
+    Map<String, dynamic> configuration = {
+      "iceServers": [
+        {"url": "stun:stun.l.google.com:19302"},
+      ]
+    };
 
-       await _createPeerConnection().then((pc) {
-      _peerConnection = pc;
-    // AG
-    sdpController.text = widget.event.offer;
-    //_setRemoteDescription();
-    //_createAnswer();
-    // AG
-    });
+    final Map<String, dynamic> offerSdpConstraints = {
+      "mandatory": {
+        "OfferToReceiveAudio": true,
+        "OfferToReceiveVideo": true,
+      },
+      "optional": [],
+    };
+
+   // _stream = await _getUserMedia();
+
+    RTCPeerConnection pc =
+        await createPeerConnection(configuration, offerSdpConstraints);
+    // if (pc != null) print(pc);
+    //pc.addStream(_stream);
+
+    bool _firstCandidate = true;
+    print(' before onIceCandidate loop ');
+
+    pc.onIceCandidate = (e) {
+      print('pc.onIceCandidate loop');
+      if (e.candidate != null) {
+        print(json.encode({
+          'candidate': e.candidate.toString(),
+          'sdpMid': e.sdpMid.toString(),
+          'sdpMlineIndex': e.sdpMlineIndex,
+        }));
+      }
+    };
+
+    pc.onIceCandidate = (e) {
+      print(' do onIceCandidate loop ');
+      if (_firstCandidate) {
+        _firstCandidate = false;
+        DbEventService(uid: widget.event.id).updateEventcandidate(
+            'candidate',
+            json.encode({
+              'candidate': e.candidate.toString(),
+              'sdpMid': e.sdpMid.toString(),
+              'sdpMlineIndex': e.sdpMlineIndex,
+            }));
+      }
+    };
+
+    pc.onIceConnectionState = (e) {
+      print('onIceConnectionState');
+      print(e);
+    };
+
+    pc.onAddStream = (stream) {
+      print('addStream: ' + stream.id);
+      _renderer.srcObject = stream;
+    };
+   _peerConnection = pc;
+    return pc;
+  }
+
+    void _addStream() {
+     _peerConnection.addStream(_stream);
+   }
 
 
-    print('_createAnswer');
-        await _setRemoteDescription();
-        RTCSessionDescription description =
+   void _createAnswer() async {
+    // await _createPeerConnection().then((pc) {
+    //   _peerConnection = pc;
+    //   // AG
+    //   sdpController.text = widget.event.offer;
+    //   //_setRemoteDescription();
+      //_createAnswer();
+      // AG
+    ///});
+
+    // print('_createAnswer');
+    // await _setRemoteDescription();
+     RTCSessionDescription description =
         await _peerConnection.createAnswer({'offerToReceiveVideo': 1});
 
     var session = parse(description.sdp);
@@ -120,10 +169,10 @@ class _ListenState extends State<Listen> {
     print(widget.event.id);
     print(widget.event.eventname);
 
-    DbEventService(uid: widget.event.id).updateEventanswer(description.type, json.encode(session));
+    DbEventService(uid: widget.event.id)
+        .updateEventanswer(description.type, json.encode(session));
 
   }
-
 
   void _setRemoteDescription() async {
     print('_setRemoteDescription');
@@ -146,92 +195,15 @@ class _ListenState extends State<Listen> {
     String jsonString = sdpController.text;
     dynamic session = await jsonDecode('$jsonString');
     //print(session['candidate']);
-    dynamic candidate =
-        new RTCIceCandidate(session['candidate'], session['sdpMid'], session['sdpMlineIndex']);
+    dynamic candidate = new RTCIceCandidate(
+        session['candidate'], session['sdpMid'], session['sdpMlineIndex']);
     await _peerConnection.addCandidate(candidate);
   }
 
-  _createPeerConnection() async {
-    Map<String, dynamic> configuration = {
-      "iceServers": [
-        {"url": "stun:stun.l.google.com:19302"},
-      ]
-    };
-
-    final Map<String, dynamic> offerSdpConstraints = {
-      "mandatory": {
-        "OfferToReceiveAudio": true,
-        "OfferToReceiveVideo": true,
-      },
-      "optional": [],
-    };
-
-    _localStream = await _getUserMedia();
-
-    RTCPeerConnection pc = await createPeerConnection(configuration, offerSdpConstraints);
-    // if (pc != null) print(pc);
-    pc.addStream(_localStream);
-    
-    bool _firstCandidate = true;
-      print(' before onIceCandidate loop ');
-
-    pc.onIceCandidate = (e) {
-      print('pc.onIceCandidate loop');
-      if (e.candidate != null) {
-        print(json.encode({
-          'candidate': e.candidate.toString(),
-          'sdpMid': e.sdpMid.toString(),
-          'sdpMlineIndex': e.sdpMlineIndex,
-        }));
-      }
-    };
-
-      pc.onIceCandidate = (e) {
-      print(' do onIceCandidate loop ');
-        if (_firstCandidate) {
-          _firstCandidate = false;
-                DbEventService(uid: widget.event.id).updateEventcandidate('candidate',
-                     json.encode({
-                     'candidate': e.candidate.toString(),
-                      'sdpMid': e.sdpMid.toString(),
-                    'sdpMlineIndex': e.sdpMlineIndex,
-                    })
-                );        }
-           };
 
 
+ 
 
-    pc.onIceConnectionState = (e) {
-      print('onIceConnectionState');
-      print(e);
-    };
-
-    pc.onAddStream = (stream) {
-      print('addStream: ' + stream.id);
-      _remoteRenderer.srcObject = stream;
-    };
-
-    return pc;
-  }
-
-  _getUserMedia() async {
-    final Map<String, dynamic> mediaConstraints = {
-      'audio': false,
-      'video': {
-        'facingMode': 'user',
-      },
-    };
-
-    MediaStream stream = await navigator.getUserMedia(mediaConstraints);
-
-    // _localStream = stream;
-    //_localRenderer.srcObject = stream;
-    //_localRenderer.mirror = true;
-
-    // _peerConnection.addStream(stream);
-
-    return stream;
-  }
 
   SizedBox videoRenderers() => SizedBox(
       height: 210,
@@ -249,7 +221,7 @@ class _ListenState extends State<Listen> {
               key: new Key("remote"),
               margin: new EdgeInsets.fromLTRB(5.0, 5.0, 5.0, 5.0),
               decoration: new BoxDecoration(color: Colors.black),
-              child: new RTCVideoView(_remoteRenderer)),
+              child: new RTCVideoView(_renderer)),
         )
       ]));
 
@@ -279,8 +251,33 @@ class _ListenState extends State<Listen> {
   Row sdpCandidateButtons() =>
       Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: <Widget>[
         RaisedButton(
+          onPressed: initRenderers,
+          child: Text('Initiate Renders'),
+          color: Colors.amber,
+        ),
+        RaisedButton(
+          onPressed: _getUserMedia,
+          child: Text('Get User Media'),
+          color: Colors.amber,
+        ),
+        RaisedButton(
+          onPressed: _createPeerConnection,
+          child: Text('Create Peer Connection'),
+          color: Colors.amber,
+        ),
+       RaisedButton(
+        onPressed: _addStream,
+          child: Text('Add PC to Stream'),
+          color: Colors.amber,
+        ),
+        RaisedButton(
           onPressed: _setRemoteDescription,
           child: Text('Set Remote Desc'),
+          color: Colors.amber,
+        ),
+         RaisedButton(
+          onPressed: _createAnswer,
+          child: Text('Create Answer'),
           color: Colors.amber,
         ),
         RaisedButton(
@@ -307,17 +304,17 @@ class _ListenState extends State<Listen> {
           title: Text(widget.title),
         ),
         body: Container(
-          decoration: BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage('assets/pytch_1125-1240.png'),
-              fit: BoxFit.cover,
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage('assets/pytch_1125-1240.png'),
+                fit: BoxFit.cover,
+              ),
             ),
-          ),
             child: Column(children: [
-          videoRenderers(),
-          offerAndAnswerButtons(),
-         // sdpCandidatesTF(),
-         // sdpCandidateButtons(),
-        ])));
+              videoRenderers(),
+              offerAndAnswerButtons(),
+               sdpCandidatesTF(),
+              sdpCandidateButtons(),
+            ])));
   }
 }
