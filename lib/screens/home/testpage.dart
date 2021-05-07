@@ -250,37 +250,37 @@ class _TestPageState extends State<TestPage> {
   //    print('Test Event for eventid updated');
   //  });
 
-   FirebaseFirestore.instance.collection('events').where('userid',isEqualTo: '1234').snapshots().listen((event) {
-     print('Event subscriptions for user 123456');
-   });
+  //  FirebaseFirestore.instance.collection('events').where('userid',isEqualTo: '1234').snapshots().listen((event) {
+  //    print('Event subscriptions for user 123456');
+  //  });
   // FirebaseFirestore.instance.collection('events').doc('eventid').collection('subCollection').doc('message6').snapshots().listen((event) { 
   //   print('New peer connection for user 1234');
   // });
 
-    FirebaseFirestore.instance.collection('events').doc('eventid').collection('subCollection').where('offerCreated',isEqualTo: 'N').snapshots().listen((event) {
-        print('New peer connection for event eventid');
-        print('create Offer');
+    // FirebaseFirestore.instance.collection('events').doc('eventid').collection('subCollection').where('offerCreated',isEqualTo: 'N').snapshots().listen((event) {
+    //     print('New peer connection for event eventid');
+    //     print('create Offer');
 
-    });
+    // });
 
-    FirebaseFirestore.instance.collection('events').doc('eventid').collection('subCollection').doc('message6').snapshots().listen((event) {
-        print('Monitor peer connection for connection updates');
+    // FirebaseFirestore.instance.collection('events').doc('eventid').collection('subCollection').doc('message6').snapshots().listen((event) {
+    //     print('Monitor peer connection for connection updates');
 
-        //print(event.toString());
-        //print(event.data().toString());
-         print(event['connected']);
-         print(event.data()['offerCreated']);
-         print(event.data()['answerCreated']);
-         print(event.data()['candidatesCreated']);
-         print(event.data()['remoteDescAssigned']);
-         print(event.data()['candidateAssigned']);
+    //     //print(event.toString());
+    //     //print(event.data().toString());
+    //      print(event['connected']);
+    //      print(event.data()['offerCreated']);
+    //      print(event.data()['answerCreated']);
+    //      print(event.data()['candidatesCreated']);
+    //      print(event.data()['remoteDescAssigned']);
+    //      print(event.data()['candidateAssigned']);
 
-         if (event.data()['offerCreated']=='Y') {
-             print('offerCreated');
-             print('Create Answer');
+    //      if (event.data()['offerCreated']=='Y') {
+    //          print('offerCreated');
+    //          print('Create Answer');
              
-         }
-    });
+    //      }
+    // });
 
   // FirebaseFirestore.instance.collection('subCollection').where('eventname',isEqualTo: 'eventid').snapshots().listen((event) 
   // { 
@@ -377,12 +377,14 @@ createOffer () async
     print('createOffer');
           await FirebaseFirestore.instance.collection('events').doc('eventid').collection("subCollection").doc("message6").update({'offerCreated': 'Y'});
 }
-createAnswer () async
+
+Future<void> createAnswer () async
 {
     print('createAnswer');
     await FirebaseFirestore.instance.collection('events').doc('eventid').collection("subCollection").doc("message6").update({'answerCreated': 'Y'});
 
 }
+
 createCandidate () async
 {
     print('createCandidate');

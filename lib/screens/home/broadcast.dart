@@ -6,6 +6,8 @@ import 'package:sdp_transform/sdp_transform.dart';
 import 'package:pytch/services/db_event.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 
 class Broadcast extends StatefulWidget {
   Broadcast({Key key, this.title}) : super(key: key);
@@ -75,6 +77,9 @@ class _BroadcastState extends State<Broadcast> {
   // }
   
     _createPeerConnection() async {
+
+    print('in _createPeerConnection');
+
     Map<String, dynamic> configuration = {
       "iceServers": [
         {"url": "stun:stun.l.google.com:19302"},
@@ -115,40 +120,97 @@ class _BroadcastState extends State<Broadcast> {
       //_remoteRenderer.srcObject = stream;
     };
     _peerConnection = pc;
-    return pc;
+    //return pc;
   }
 
    void _addStream() {
+         print('in _addStream');
+
      _peerConnection.addStream(_stream);
    }
 void _createEvent() async {
     var uuid = Uuid();
     eventid = uuid.v4();
       await DbEventService(uid: eventid).createEventData('Manly round 5', '1234');
-
 }
-  void _createOffer() async {
+
+void _broadcast() async {
+
+    FirebaseFirestore.instance.collection('events').doc(eventid).collection('PeerConnections').where('offerCreated',isEqualTo: 'N').snapshots().listen((event) {
+        print('New peer connection for event eventid');
+        print('create Offer');
+      event.docs.forEach((doc) {
+            print('looping');
+             print(doc["connected"]);
+            print(doc.reference.id);
+            // _createPeerConnection();
+            // //_peerConnection =  _createPeerConnection();
+            // _addStream();
+            // _createOffer();
+            createConnection(doc.reference.id);
+            // 
+
+
+
+            //
+
+
+         });
+    });
+}
+
+void createConnection(String pcid) async {
+ await _createPeerConnection();
+ await _addStream();
+  await _createOffer(pcid);
+}
+
+
+   _createOffer(String pcid) async {
     // AG
    // var uuid = Uuid();
    // var eventid = uuid.v4();
     // AG
+    print('in _createOffer');
+
     RTCSessionDescription description =
         await _peerConnection.createOffer({'offerToReceiveAudio': 0,'offerToReceiveVideo': 0});
        // await _peerConnection.createOffer({'offerToReceiveVideo': 1});
-    var session = parse(description.sdp);
-    print(json.encode(session));
-    _offer = true;
+    print('created _createOffer');
+
+
+     var session = parse(description.sdp);
+     print(json.encode(session));
+     _offer = true;
 
     // print(json.encode({
     //       'sdp': description.sdp.toString(),
     //       'type': description.type.toString(),
     //     }));
 
-    await _peerConnection.setLocalDescription(description);
+     await _peerConnection.setLocalDescription(description);
+    print('created setLocalDescription');
+
     // AG
     //print(eventid);
     //await DbEventService(uid: eventid).createEventData('Manly round 5', '1234');
-    await DbEventService(uid: eventid).updateEventoffer(description.type, json.encode(session));
+    //await DbEventService(uid: eventid).updateEventoffer(description.type, json.encode(session));
+
+
+     await   FirebaseFirestore.instance.collection('events').doc(eventid).collection('PeerConnections').doc(pcid)
+           .update({'offerCreated': 'Y',
+             'offer': {'type': description.type, 'sdp': json.encode(session)},
+
+           })
+           .then((value) => print("Offer Property updated"))
+           .catchError(
+               (error) => print("Failed to update offer property: $error"));
+
+
+    // print('createOffer');
+    //       await FirebaseFirestore.instance.collection('events').doc('eventid').collection("subCollection").doc("message6").update({'offerCreated': 'Y'});
+
+
     print('herrrrrrrrrrrrrrrrre');
 
 
@@ -274,20 +336,20 @@ void _createEvent() async {
 
   Row offerAndAnswerButtons() =>
       Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: <Widget>[
-        new RaisedButton(
-          // onPressed: () {
-          //   return showDialog(
-          //       context: context,
-          //       builder: (context) {
-          //         return AlertDialog(
-          //           content: Text(sdpController.text),
-          //         );
-          //       });
-          // },
-          onPressed: _createOffer,
-          child: Text('Broadcast'),
-          color: Colors.amber,
-          ),
+        // new RaisedButton(
+        //   // onPressed: () {
+        //   //   return showDialog(
+        //   //       context: context,
+        //   //       builder: (context) {
+        //   //         return AlertDialog(
+        //   //           content: Text(sdpController.text),
+        //   //         );
+        //   //       });
+        //   // },
+        //   onPressed: _createOffer('pcid'),
+        //   child: Text('Broadcast'),
+        //   color: Colors.amber,
+        //   ),
         // RaisedButton(
         //   onPressed: _createAnswer,
         //   child: Text('Answer'),
@@ -310,10 +372,14 @@ void _createEvent() async {
         ),
         RaisedButton(
           onPressed: _createEvent,
-          child: Text('Get User Media'),
+          child: Text('Create Event'),
           color: Colors.amber,
         ),
         RaisedButton(
+          onPressed: _broadcast,
+          child: Text('Start Broadcasting'),
+          color: Colors.amber,
+        ),        RaisedButton(
           onPressed: _createPeerConnection,
           child: Text('Create Peer Connection'),
           color: Colors.amber,
@@ -323,11 +389,11 @@ void _createEvent() async {
           child: Text('Add PC to Stream'),
           color: Colors.amber,
         ),
-        RaisedButton(
-          onPressed: _createOffer,
-          child: Text('Create Offer'),
-          color: Colors.amber,
-        ),
+        //  RaisedButton(
+        //    onPressed: _createOffer,
+        //    child: Text('Create Offer'),
+        //    color: Colors.amber,
+        //  ),
         RaisedButton(
           onPressed: _setRemoteDescription,
           child: Text('Set Remote Desc'),

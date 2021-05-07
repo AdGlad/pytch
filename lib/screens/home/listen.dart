@@ -9,6 +9,8 @@ import 'package:pytch/models/event.dart';
 import 'package:pytch/models/candidate.dart';
 import 'package:uuid/uuid.dart';
 import 'dart:convert';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 // AG
 
 class Listen extends StatefulWidget {
@@ -28,6 +30,8 @@ class _ListenState extends State<Listen> {
   MediaStream _stream;
   RTCVideoRenderer _renderer = new RTCVideoRenderer();
   final sdpController = TextEditingController();
+  String pcid ;
+  var uuid = Uuid();
 
   @override
   dispose() {
@@ -73,7 +77,39 @@ class _ListenState extends State<Listen> {
     return stream;
   }
 
+  Future<void> createPC (var eventid) async {
+      print('in createPC');
+      pcid = uuid.v4();
+      var _collectionReference = FirebaseFirestore.instance.collection('events');
+
+       return _collectionReference
+          .doc(eventid).collection("PeerConnections").doc(pcid).set({
+            'offer': {'type': '','sdp': ''} ,
+            'answer': {'type': '','sdp': ''} ,
+            'candidate': {'type': '','sdp': ''} , 
+            'connected': 'N' ,
+            'offerCreated': 'N' ,
+            'answerCreated': 'N' ,
+            'candidatesCreated': 'N' ,
+            'remoteDescAssigned': 'N' ,
+            'candidateAssigned': 'N' ,
+            })
+          .then((value) => print("PeerCollection Added"))
+          .catchError((error) => print("Failed to add PeerCollection: $error"));
+
+    }
+
+    createRDAnswer() async {
+              await _setRemoteDescription(); 
+              await _createAnswer();
+    }
+
     _createPeerConnection() async {
+
+      //String pcid ;
+      //var uuid = Uuid();
+      pcid = uuid.v4();
+
     Map<String, dynamic> configuration = {
       "iceServers": [
         {"url": "stun:stun.l.google.com:19302"},
@@ -95,6 +131,31 @@ class _ListenState extends State<Listen> {
     // if (pc != null) print(pc);
     //pc.addStream(_stream);
 
+    createPC(widget.event.id);
+    
+    print("pcid ${pcid}");
+
+    FirebaseFirestore.instance.collection('events').doc(widget.event.id).collection('PeerConnections').doc(pcid).snapshots().listen((event) {
+        print('Monitor peer connection for connection updates');
+        //print(event.toString());
+        //print(event.data().toString());
+        //  print(event.data()['offerCreated']);
+        //  print(event.data()['answerCreated']);
+        //  print(event.data()['candidatesCreated']);
+        //  print(event.data()['remoteDescAssigned']);
+        //  print(event.data()['candidateAssigned']);
+
+          if (event.data()['offerCreated']=='Y') {
+              print('offerCreated');
+              print('Create Answer');
+                  if (event.data()['answerCreated']=='N') {
+                     sdpController.text = event.data()['offer']['sdp'];
+                        createRDAnswer();
+                     }
+             
+          }
+    });
+
     bool _firstCandidate = true;
     print(' before onIceCandidate loop ');
 
@@ -113,13 +174,21 @@ class _ListenState extends State<Listen> {
       print(' do onIceCandidate loop ');
       if (_firstCandidate) {
         _firstCandidate = false;
-        DbEventService(uid: widget.event.id).updateEventcandidate(
-            'candidate',
-            json.encode({
-              'candidate': e.candidate.toString(),
-              'sdpMid': e.sdpMid.toString(),
-              'sdpMlineIndex': e.sdpMlineIndex,
-            }));
+        // DbEventService(uid: widget.event.id).updateEventcandidate(
+        //     'candidate',
+        //     json.encode({
+        //       'candidate': e.candidate.toString(),
+        //       'sdpMid': e.sdpMid.toString(),
+        //       'sdpMlineIndex': e.sdpMlineIndex,
+        //     }));
+
+           FirebaseFirestore.instance.collection('events').doc(widget.event.id).collection('PeerConnections').doc(pcid)
+           .update({'candidatesCreated': 'Y',
+             'candidate': {'type': 'candidate', 'sdp': json.encode({'candidate': e.candidate.toString(),'sdpMid': e.sdpMid.toString(),'sdpMlineIndex': e.sdpMlineIndex,}),}
+           })
+           .then((value) => print("Answer Property updated"))
+           .catchError(
+               (error) => print("Failed to update answer property: $error"));
       }
     };
 
@@ -142,6 +211,7 @@ class _ListenState extends State<Listen> {
 
 
    void _createAnswer() async {
+     print('in _createAnswer');
     // await _createPeerConnection().then((pc) {
     //   _peerConnection = pc;
     //   // AG
@@ -166,11 +236,21 @@ class _ListenState extends State<Listen> {
 
     _peerConnection.setLocalDescription(description);
     // AG
-    print(widget.event.id);
-    print(widget.event.eventname);
+    //print(widget.event.id);
+    //print(widget.event.eventname);
 
-    DbEventService(uid: widget.event.id)
-        .updateEventanswer(description.type, json.encode(session));
+    // DbEventService(uid: widget.event.id)
+    //     .updateEventanswer(description.type, json.encode(session));
+
+         await   FirebaseFirestore.instance.collection('events').doc(widget.event.id).collection('PeerConnections').doc(pcid)
+           .update({'answerCreated': 'Y',
+             'answer': {'type': description.type, 'sdp': json.encode(session)},
+
+           })
+           .then((value) => print("Answer Property updated"))
+           .catchError(
+               (error) => print("Failed to update answer property: $error"));
+
 
   }
 
