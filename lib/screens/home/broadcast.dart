@@ -148,7 +148,15 @@ void _broadcast() async {
             // _addStream();
             // _createOffer();
             createConnection(doc.reference.id);
-            // 
+            // We know the peerconnection id so can listen for the document. Can check that candidate and anser are set to Y
+    FirebaseFirestore.instance.collection('events').doc(eventid).collection('PeerConnections').doc(doc.reference.id).snapshots().listen((event) 
+    {
+      if (event.data()['candidatesCreated']=='Y') {
+         print('Candidates created');
+        setRemoteDetails( event.data()['answer']['sdp'], event.data()['candidate']['sdp']);
+      }
+
+    });
 
 
 
@@ -158,6 +166,17 @@ void _broadcast() async {
          });
     });
 }
+
+void setRemoteDetails( String answersdp, String candidatesdp) async {
+            sdpController.text = answersdp;
+             await _setRemoteDescription();
+
+          sdpController.text = candidatesdp;
+          await _addCandidate();
+}
+
+
+
 
 void createConnection(String pcid) async {
  await _createPeerConnection();
