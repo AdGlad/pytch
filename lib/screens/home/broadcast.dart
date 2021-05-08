@@ -55,7 +55,7 @@ class _BroadcastState extends State<Broadcast> {
     //     'facingMode': 'user',
     //   },
     final Map<String, dynamic> mediaConstraints = {
-      'audio': false,
+      'audio': true,
       'video': true,
 
     };

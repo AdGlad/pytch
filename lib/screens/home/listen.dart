@@ -159,23 +159,30 @@ class _ListenState extends State<Listen> {
     });
 
     bool _firstCandidate = true;
+    String search = ' udp ';
+    String str = '';
     print(' before onIceCandidate loop ');
 
-    pc.onIceCandidate = (e) {
-      print('pc.onIceCandidate loop');
-      if (e.candidate != null) {
-        print(json.encode({
-          'candidate': e.candidate.toString(),
-          'sdpMid': e.sdpMid.toString(),
-          'sdpMlineIndex': e.sdpMlineIndex,
-        }));
-      }
-    };
+    // pc.onIceCandidate = (e) {
+    //   print('pc.onIceCandidate loop');
+    //   if (e.candidate != null) {
+    //     print(json.encode({
+    //       'candidate': e.candidate.toString(),
+    //       'sdpMid': e.sdpMid.toString(),
+    //       'sdpMlineIndex': e.sdpMlineIndex,
+    //     }));
+    //   }
+    // };
 
     pc.onIceCandidate = (e) {
       print(' do onIceCandidate loop ');
-      if (_firstCandidate) {
+      str=e.candidate.toString();
+      RegExp exp = new RegExp( search, caseSensitive: true, ); 
+      bool isudp = exp.hasMatch(str);
+      print(isudp);
+      if (_firstCandidate && isudp) {
         _firstCandidate = false;
+
         // DbEventService(uid: widget.event.id).updateEventcandidate(
         //     'candidate',
         //     json.encode({
