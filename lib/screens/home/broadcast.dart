@@ -1,14 +1,11 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-// import 'package:flutter_webrtc/web/rtc_session_description.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
-//import 'package:flutter_webrtc/webrtc.dart';
 import 'package:sdp_transform/sdp_transform.dart';
 import 'package:pytch/services/db_event.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
 
 class Broadcast extends StatefulWidget {
   Broadcast({Key key, this.title}) : super(key: key);
@@ -18,7 +15,7 @@ class Broadcast extends StatefulWidget {
 }
 
 class _BroadcastState extends State<Broadcast> {
-  var eventid ;
+  var eventid;
 
   bool _offer = false;
   RTCPeerConnection _peerConnection;
@@ -35,10 +32,6 @@ class _BroadcastState extends State<Broadcast> {
 
   @override
   void initState() {
-    //initRenderers();
-    // _createPeerConnection().then((pc) {
-    //   _peerConnection = pc;
-    // });
     super.initState();
   }
 
@@ -48,38 +41,19 @@ class _BroadcastState extends State<Broadcast> {
   }
 
   _getUserMedia() async {
-
-    // final Map<String, dynamic> mediaConstraints = {
-    //   'audio': true,
-    //   'video': {
-    //     'facingMode': 'user',
-    //   },
     final Map<String, dynamic> mediaConstraints = {
       'audio': true,
       'video': true,
-
     };
 
-    //MediaStream stream = await navigator.getUserMedia(mediaConstraints);
-    MediaStream stream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
-    // _stream = stream;
+    MediaStream stream =
+        await navigator.mediaDevices.getUserMedia(mediaConstraints);
     _renderer.srcObject = stream;
-    //0.6.3// _renderer.mirror = true;
-    //_renderer.
     _stream = stream;
-
-    // _peerConnection.addStream(stream);
-
     return stream;
   }
-  // void _openMedia() async{
-  //   _createPeerConnection().then((pc) {
-  //     _peerConnection = pc;
-  //   });
-  // }
-  
-    _createPeerConnection() async {
 
+  _createPeerConnection() async {
     print('in _createPeerConnection');
 
     Map<String, dynamic> configuration = {
@@ -96,11 +70,8 @@ class _BroadcastState extends State<Broadcast> {
       "optional": [],
     };
 
-    //_stream = await _getUserMedia();
-
-    RTCPeerConnection pc = await createPeerConnection(configuration, offerSdpConstraints);
-    // if (pc != null) print(pc);
-    //pc.addStream(_stream);
+    RTCPeerConnection pc =
+        await createPeerConnection(configuration, offerSdpConstraints);
 
     pc.onIceCandidate = (e) {
       if (e.candidate != null) {
@@ -125,175 +96,102 @@ class _BroadcastState extends State<Broadcast> {
     //return pc;
   }
 
-   void _addStream() {
-         print('in _addStream');
+  void _addStream() {
+    print('in _addStream');
 
-     _peerConnection.addStream(_stream);
-   }
-void _createEvent() async {
-    var uuid = Uuid();
-    eventid = uuid.v4();
-      await DbEventService(uid: eventid).createEventData('Manly round 5', '1234');
-}
-
-void _broadcast() async {
-
-    FirebaseFirestore.instance.collection('events').doc(eventid).collection('PeerConnections').where('offerCreated',isEqualTo: 'N').snapshots().listen((event) {
-        print('New peer connection for event eventid');
-        print('create Offer');
-      event.docs.forEach((doc) {
-            print('looping');
-             print(doc["connected"]);
-            print(doc.reference.id);
-            // _createPeerConnection();
-            // //_peerConnection =  _createPeerConnection();
-            // _addStream();
-            // _createOffer();
-            createConnection(doc.reference.id);
-            // We know the peerconnection id so can listen for the document. Can check that candidate and anser are set to Y
-    FirebaseFirestore.instance.collection('events').doc(eventid).collection('PeerConnections').doc(doc.reference.id).snapshots().listen((event) 
-    {
-      if (event.data()['candidatesCreated']=='Y') {
-         print('Candidates created');
-        setRemoteDetails( event.data()['answer']['sdp'], event.data()['candidate']['sdp']);
-      }
-
-    });
-
-
-
-            //
-
-
-         });
-    });
-}
-
-void setRemoteDetails( String answersdp, String candidatesdp) async {
-            sdpController.text = answersdp;
-             await _setRemoteDescription();
-
-          sdpController.text = candidatesdp;
-          await _addCandidate();
-}
-
-
-
-
-void createConnection(String pcid) async {
- await _createPeerConnection();
- await _addStream();
-  await _createOffer(pcid);
-}
-
-
-   _createOffer(String pcid) async {
-    // AG
-   // var uuid = Uuid();
-   // var eventid = uuid.v4();
-    // AG
-    print('in _createOffer');
-
-    RTCSessionDescription description =
-        await _peerConnection.createOffer({'offerToReceiveAudio': 0,'offerToReceiveVideo': 0});
-       // await _peerConnection.createOffer({'offerToReceiveVideo': 1});
-    print('created _createOffer');
-
-
-     var session = parse(description.sdp);
-     print(json.encode(session));
-     _offer = true;
-
-    // print(json.encode({
-    //       'sdp': description.sdp.toString(),
-    //       'type': description.type.toString(),
-    //     }));
-
-     await _peerConnection.setLocalDescription(description);
-    print('created setLocalDescription');
-
-    // AG
-    //print(eventid);
-    //await DbEventService(uid: eventid).createEventData('Manly round 5', '1234');
-    //await DbEventService(uid: eventid).updateEventoffer(description.type, json.encode(session));
-
-
-     await   FirebaseFirestore.instance.collection('events').doc(eventid).collection('PeerConnections').doc(pcid)
-           .update({'offerCreated': 'Y',
-             'offer': {'type': description.type, 'sdp': json.encode(session)},
-
-           })
-           .then((value) => print("Offer Property updated"))
-           .catchError(
-               (error) => print("Failed to update offer property: $error"));
-
-
-    // print('createOffer');
-    //       await FirebaseFirestore.instance.collection('events').doc('eventid').collection("subCollection").doc("message6").update({'offerCreated': 'Y'});
-
-
-    print('herrrrrrrrrrrrrrrrre');
-
-
-      //  DbEventService(uid: eventid).eventData.listen((event) async {
-      //   print('event');
-      //    print(event);
-      //    print('answer');
-      //    print(event.answer);
-      //    print('Value from controller: event');
-      //    print('candidate');
-      //    print(event.candidate);
-
-      //    if (event.answer.isNotEmpty )
-      //    {
-      //      sdpController.text = event.answer;
-      //     await _setRemoteDescription();
-      //    }
-
-      //    if (event.candidate.isNotEmpty )
-      //    {
-      //      sdpController.text = event.candidate;
-      //     await _addCandidate();
-      //    }
-      //    //.toString();
-      //  });
-    // AG
-    // 
-    // 
-    // Put this back VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV
-      // await DbEventService(uid: eventid).eventConnection.listen((event)  async {
-      //    print('eventConnection');
-      //    event.docs.forEach((doc) async {
-      //       print('looping');
-      //       print(doc["connected"]);
-      //       if (doc['answer']['sdp'].isNotEmpty )
-      //         {
-      //          print('Updating answer');
-      //          sdpController.text = doc['answer']['sdp'];
-      //           await _setRemoteDescription();
-      //         }
-
-      //       if (doc['candidate']['sdp'].isNotEmpty )
-      //         {
-      //         print('Updating candidate');
-      //         sdpController.text = doc['candidate']['sdp'];
-      //          await _addCandidate();
-      //         DbEventService(uid: eventid).updateEventconnection('Y');
-      //       }
-      //   });
-      //   });
-    // Put this back NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN
-
+    _peerConnection.addStream(_stream);
   }
 
-   void _setRemoteDescription() async {
+  void _createEvent() async {
+    var uuid = Uuid();
+    eventid = uuid.v4();
+    await DbEventService(uid: eventid).createEventData('Manly round 5', '1234');
+  }
+
+  void _broadcast() async {
+    FirebaseFirestore.instance
+        .collection('events')
+        .doc(eventid)
+        .collection('PeerConnections')
+        .where('offerCreated', isEqualTo: 'N')
+        .snapshots()
+        .listen((event) {
+      print('New peer connection for event eventid');
+      print('create Offer');
+      event.docs.forEach((doc) {
+        print('looping');
+        print(doc["connected"]);
+        print(doc.reference.id);
+        createConnection(doc.reference.id);
+        // We know the peerconnection id so can listen for the document. Can check that candidate and anser are set to Y
+        FirebaseFirestore.instance
+            .collection('events')
+            .doc(eventid)
+            .collection('PeerConnections')
+            .doc(doc.reference.id)
+            .snapshots()
+            .listen((event) {
+          if (event.data()['candidatesCreated'] == 'Y') {
+            print('Candidates created');
+            setRemoteDetails(event.data()['answer']['sdp'],
+                event.data()['candidate']['sdp']);
+          }
+        });
+      });
+    });
+  }
+
+  void setRemoteDetails(String answersdp, String candidatesdp) async {
+    sdpController.text = answersdp;
+    await _setRemoteDescription();
+
+    sdpController.text = candidatesdp;
+    await _addCandidate();
+  }
+
+  void createConnection(String pcid) async {
+    await _createPeerConnection();
+    await _addStream();
+    await _createOffer(pcid);
+  }
+
+  _createOffer(String pcid) async {
+    print('in _createOffer');
+
+    RTCSessionDescription description = await _peerConnection
+        .createOffer({'offerToReceiveAudio': 0, 'offerToReceiveVideo': 0});
+    // await _peerConnection.createOffer({'offerToReceiveVideo': 1});
+    print('created _createOffer');
+
+    var session = parse(description.sdp);
+    print(json.encode(session));
+    _offer = true;
+
+    await _peerConnection.setLocalDescription(description);
+    print('created setLocalDescription');
+
+    await FirebaseFirestore.instance
+        .collection('events')
+        .doc(eventid)
+        .collection('PeerConnections')
+        .doc(pcid)
+        .update({
+          'offerCreated': 'Y',
+          'offer': {'type': description.type, 'sdp': json.encode(session)},
+        })
+        .then((value) => print("Offer Property updated"))
+        .catchError(
+            (error) => print("Failed to update offer property: $error"));
+
+    print('herrrrrrrrrrrrrrrrre');
+  }
+
+  void _setRemoteDescription() async {
     String jsonString = sdpController.text;
     dynamic session = await jsonDecode('$jsonString');
 
     String sdp = write(session, null);
 
-    // RTCSessionDescription description =
-    //     new RTCSessionDescription(session['sdp'], session['type']);
     RTCSessionDescription description =
         new RTCSessionDescription(sdp, _offer ? 'answer' : 'offer');
     print(description.toMap());
@@ -305,55 +203,47 @@ void createConnection(String pcid) async {
     String jsonString = sdpController.text;
     dynamic session = await jsonDecode('$jsonString');
     print(session['candidate']);
-    dynamic candidate =
-        new RTCIceCandidate(session['candidate'], session['sdpMid'], session['sdpMlineIndex']);
+    dynamic candidate = new RTCIceCandidate(
+        session['candidate'], session['sdpMid'], session['sdpMlineIndex']);
     await _peerConnection.addCandidate(candidate);
   }
-
-
-
 
   SizedBox videoRenderers() => SizedBox(
       height: 210,
       child: Row(children: [
         Flexible(
           child: new Container(
-            key: new Key("local"),
-            margin: new EdgeInsets.fromLTRB(5.0, 5.0, 5.0, 5.0),
-            decoration: new BoxDecoration(color: Colors.black),
-            child: new RTCVideoView(_renderer, mirror: true,)
-          ),
+              key: new Key("local"),
+              margin: new EdgeInsets.fromLTRB(5.0, 5.0, 5.0, 5.0),
+              decoration: new BoxDecoration(color: Colors.black),
+              child: new RTCVideoView(
+                _renderer,
+                mirror: true,
+              )),
         ),
-        // Flexible(
-        //   child: new Container(
-        //       key: new Key("remote"),
-        //       margin: new EdgeInsets.fromLTRB(5.0, 5.0, 5.0, 5.0),
-        //       decoration: new BoxDecoration(color: Colors.black),
-        //       child: new RTCVideoView(_remoteRenderer)),
-        // )
       ]));
 
-  _checkPCState () => print(_peerConnection.iceConnectionState);
+  _checkPCState() => print(_peerConnection.iceConnectionState);
 
   Row connectionState() =>
-  Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: <Widget> [
-          new RaisedButton(onPressed: _checkPCState,
-                             child: Text('Connection State'), 
-                            color: Colors.amber,
-                             //style: TextButton.styleFrom(primary: Colors.green),
-          )
-  ]
-  );
+      Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: <Widget>[
+        new RaisedButton(
+          onPressed: _checkPCState,
+          child: Text('Connection State'),
+          color: Colors.amber,
+          //style: TextButton.styleFrom(primary: Colors.green),
+        )
+      ]);
 
   Row openMediaButton() =>
-  Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: <Widget> [
-          new RaisedButton(onPressed: _createPeerConnection(),
-                             child: Text('Audio On'), 
-                            color: Colors.amber,
-                             //style: TextButton.styleFrom(primary: Colors.green),
-          )
-  ]
-  );
+      Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: <Widget>[
+        new RaisedButton(
+          onPressed: _createPeerConnection(),
+          child: Text('Audio On'),
+          color: Colors.amber,
+          //style: TextButton.styleFrom(primary: Colors.green),
+        )
+      ]);
 
   Row offerAndAnswerButtons() =>
       Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: <Widget>[
@@ -376,12 +266,11 @@ void createConnection(String pcid) async {
         //   child: Text('Answer'),
         //   color: Colors.amber,
         // ),
-      ]
-      );
+      ]);
 
   Row sdpCandidateButtons() =>
       Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: <Widget>[
-          RaisedButton(
+        RaisedButton(
           onPressed: initRenderers,
           child: Text('Initiate Renders'),
           color: Colors.amber,
@@ -400,21 +289,17 @@ void createConnection(String pcid) async {
           onPressed: _broadcast,
           child: Text('Start Broadcasting'),
           color: Colors.amber,
-        ),        RaisedButton(
+        ),
+        RaisedButton(
           onPressed: _createPeerConnection,
           child: Text('Create Peer Connection'),
           color: Colors.amber,
         ),
-       RaisedButton(
-        onPressed: _addStream,
+        RaisedButton(
+          onPressed: _addStream,
           child: Text('Add PC to Stream'),
           color: Colors.amber,
         ),
-        //  RaisedButton(
-        //    onPressed: _createOffer,
-        //    child: Text('Create Offer'),
-        //    color: Colors.amber,
-        //  ),
         RaisedButton(
           onPressed: _setRemoteDescription,
           child: Text('Set Remote Desc'),
@@ -444,20 +329,20 @@ void createConnection(String pcid) async {
           title: Text(widget.title),
         ),
         body: Container(
-          decoration: BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage('assets/pytch_1125-1240.png'),
-              fit: BoxFit.cover,
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage('assets/pytch_1125-1240.png'),
+                fit: BoxFit.cover,
+              ),
             ),
-          ),
             child: Column(children: [
-          //openMediaButton(),
-          videoRenderers(),
-          //connectionState(),
-          //openMediaButton(),
-          //offerAndAnswerButtons(),
-          sdpCandidatesTF(),
-          sdpCandidateButtons(),
-        ])));
+              //openMediaButton(),
+              videoRenderers(),
+              //connectionState(),
+              //openMediaButton(),
+              //offerAndAnswerButtons(),
+              sdpCandidatesTF(),
+              sdpCandidateButtons(),
+            ])));
   }
 }
