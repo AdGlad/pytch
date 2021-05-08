@@ -2,7 +2,8 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 // import 'package:flutter_webrtc/web/rtc_session_description.dart';
-import 'package:flutter_webrtc/webrtc.dart';
+//import 'package:flutter_webrtc/webrtc.dart';
+import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:sdp_transform/sdp_transform.dart';
 import 'package:pytch/services/db_event.dart';
 // AG
@@ -185,7 +186,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     // _localStream = stream;
     _localRenderer.srcObject = stream;
-    _localRenderer.mirror = true;
+    // 0.6.3 // _localRenderer.mirror = true;
 
     // _peerConnection.addStream(stream);
 

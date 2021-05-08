@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 // import 'package:flutter_webrtc/web/rtc_session_description.dart';
-import 'package:flutter_webrtc/webrtc.dart';
+//import 'package:flutter_webrtc/webrtc.dart';
+import 'package:flutter_webrtc/flutter_webrtc.dart';
+
 import 'package:sdp_transform/sdp_transform.dart';
 // AG
 import 'package:pytch/services/db_event.dart';
@@ -67,7 +69,7 @@ class _ListenState extends State<Listen> {
       },
   };
 
-    MediaStream stream = await navigator.getUserMedia(mediaConstraints);
+    MediaStream stream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
 
      _stream = stream;
     //_localRenderer.srcObject = stream;
@@ -301,7 +303,7 @@ class _ListenState extends State<Listen> {
               key: new Key("remote"),
               margin: new EdgeInsets.fromLTRB(5.0, 5.0, 5.0, 5.0),
               decoration: new BoxDecoration(color: Colors.black),
-              child: new RTCVideoView(_renderer)),
+              child: new RTCVideoView(_renderer, mirror: true,)),
         )
       ]));
 

@@ -1,7 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 // import 'package:flutter_webrtc/web/rtc_session_description.dart';
-import 'package:flutter_webrtc/webrtc.dart';
+import 'package:flutter_webrtc/flutter_webrtc.dart';
+//import 'package:flutter_webrtc/webrtc.dart';
 import 'package:sdp_transform/sdp_transform.dart';
 import 'package:pytch/services/db_event.dart';
 import 'package:provider/provider.dart';
@@ -59,11 +60,12 @@ class _BroadcastState extends State<Broadcast> {
 
     };
 
-    MediaStream stream = await navigator.getUserMedia(mediaConstraints);
-
+    //MediaStream stream = await navigator.getUserMedia(mediaConstraints);
+    MediaStream stream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
     // _stream = stream;
     _renderer.srcObject = stream;
-    _renderer.mirror = true;
+    //0.6.3// _renderer.mirror = true;
+    //_renderer.
     _stream = stream;
 
     // _peerConnection.addStream(stream);
@@ -319,7 +321,7 @@ void createConnection(String pcid) async {
             key: new Key("local"),
             margin: new EdgeInsets.fromLTRB(5.0, 5.0, 5.0, 5.0),
             decoration: new BoxDecoration(color: Colors.black),
-            child: new RTCVideoView(_renderer)
+            child: new RTCVideoView(_renderer, mirror: true,)
           ),
         ),
         // Flexible(
